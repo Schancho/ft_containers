@@ -13,16 +13,16 @@ class Vector
 			typedef   Alloc allocator_type;
 			typedef        T value_type ;
 			allocator_type _alloc;
-			typedef random_access_iterator<T> iterator;
-			typedef random_access_iterator<const T> const_iterator;
+			typedef random_access_iterator<value_type> iterator;
+			typedef random_access_iterator<const value_type> const_iterator;
 
 
-		// Vector()
-		// {
-		// 	_size = 0;
-		// 	// _capacity = 0;
-		// 	_data = nullptr;
-		// }
+		Vector()
+		{
+			_data = _alloc.allocate(1);
+			_capacity = 1;
+			_size =0;
+		}
 		Vector(unsigned int cap)
 		{
 			_capacity = cap;

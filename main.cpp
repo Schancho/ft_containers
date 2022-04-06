@@ -3,7 +3,7 @@
 
 int main()
 {
-     ft::Vector<int> v(4);
+     ft::Vector<int> v;
 
 
 
