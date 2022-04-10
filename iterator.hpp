@@ -1,101 +1,136 @@
-#ifndef random_access_iterator_H
-#define random_access_iterator_H
+#ifndef ITERATOR_HPP
+#define ITERATOR_HPP
 
 #include <iostream>
 #include <string>
-
+#include "iterator_traits.hpp"
 namespace ft
 {
     template <typename T>
-    class random_access_iterator
+    class iterator_op : public ft::iterator<std::random_access_iterator_tag, T>
     {
         public:
-            random_access_iterator( T* ptr)
-            {
-                _ptr = ptr;
-            }
-
-          operator  random_access_iterator<const T> ()
-            {
-                std::cout << "Hey" << std::endl;
-                return random_access_iterator<const T>(_ptr);
-            }
-             operator  random_access_iterator< const T> ()  const
+            typedef typename iterator<std::random_access_iterator_tag, T>::difference_type		difference_type;
+			typedef typename iterator<std::random_access_iterator_tag, T>::value_type			value_type;
+			typedef typename iterator<std::random_access_iterator_tag, T>::pointer				pointer;
+			typedef typename iterator<std::random_access_iterator_tag, T>::reference			reference;
+			typedef typename iterator<std::random_access_iterator_tag, T>::iterator_category	iterator_category;
+            iterator_op(T *ptr) : _ptr(ptr) {}
+            iterator_op(const iterator_op &it) : _ptr(it._ptr) {}
+             operator  iterator_op<const T> ()
             {
                 std::cout << "Hey" << std::endl;
-                return random_access_iterator<const T>(_ptr);
+                return iterator_op<const T>(_ptr);
             }
-
-
-            random_access_iterator(const random_access_iterator& src)
-            {
-                std::cout<< "Copy" << std::endl;
-                _ptr = src._ptr;
-            }
-            // template <typename T>
-            // random_access_iterator(const random_access_iterator<const T>& src)
+            //  operator  iterator_op< const T> ()  const
             // {
-            //     _ptr = src._ptr;
+            //     std::cout << "Allo" << std::endl;
+            //     return iterator_op<const T>(_ptr);
             // }
-            
-            random_access_iterator & operator++(void)
+            iterator_op &operator=(const iterator_op &it) 
             {
-                _ptr++;
+                _ptr = it._ptr;
                 return *this;
             }
-            random_access_iterator & operator++(int)
+
+            iterator_op &operator++()
             {
-                random_access_iterator tmp = *this;
-                _ptr++;
-                return tmp;
-            }
-            random_access_iterator & operator--(void)
-            {
-                _ptr--;
+                ++_ptr;
                 return *this;
             }
-            random_access_iterator & operator--(int)
+
+            iterator_op operator++(int)
             {
-                random_access_iterator tmp = *this;
-                _ptr--;
+                iterator_op tmp(*this);
+                ++_ptr;
                 return tmp;
             }
-            T & operator*(void)
+
+            iterator_op &operator--()
+            {
+                --_ptr;
+                return *this;
+            }
+            iterator_op operator--(int)
+            {
+                iterator_op tmp(*this);
+                --_ptr;
+                return tmp;
+            }
+
+            iterator_op &operator+=(difference_type n)
+            {
+                _ptr += n;
+                return *this;
+            }
+
+            iterator_op &operator-=(difference_type n)
+            {
+                _ptr -= n;
+                return *this;
+            }
+
+            iterator_op operator+(difference_type n)
+            {
+                iterator_op tmp(*this);
+                tmp += n;
+                return tmp;
+            }
+
+            iterator_op operator-(difference_type n)
+            {
+                iterator_op tmp(*this);
+                tmp -= n;
+                return tmp;
+            }
+
+            difference_type operator-(const iterator_op &it)
+            {
+                return _ptr - it._ptr;
+            }
+
+            reference operator*()
             {
                 return *_ptr;
             }
-            T * operator->(void)
+
+            pointer operator->()
             {
                 return _ptr;
             }
-            bool operator==(const random_access_iterator& rhs)
+
+            bool operator==(const iterator_op &it)
             {
-                return (_ptr == rhs._ptr);
+                return _ptr == it._ptr;
             }
-            bool operator!=(const random_access_iterator& rhs)
+
+            bool operator!=(const iterator_op &it)
             {
-                return (_ptr != rhs._ptr);
-            }
-            //asigeration operator
-            random_access_iterator & operator=( random_access_iterator< T>& rhs)
+                return _ptr != it._ptr;
+            }   
+
+            bool operator<(const iterator_op &it)
             {
-                std::cout << "assignation" << std::endl;
-                _ptr = rhs._ptr;
-                return *this;
+                return _ptr < it._ptr;
             }
-            // template <typename const T>
-            // random_access_iterator & operator=( random_access_iterator< T>& rhs)
-            // {
-            //     _ptr = rhs._ptr;
-            //     return *this;
-            // }
 
+            bool operator>(const iterator_op &it)
+            {
+                return _ptr > it._ptr;
+            }
 
+            bool operator<=(const iterator_op &it)
+            {
+                return _ptr <= it._ptr;
+            }
 
+            bool operator>=(const iterator_op &it)
+            {
+                return _ptr >= it._ptr;
+            }
 
-
+        private:
             T *_ptr;
-
     };
 }
 

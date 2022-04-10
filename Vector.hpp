@@ -5,16 +5,24 @@
 # include <string>
 #include <memory>
 #include "iterator.hpp"
+
 namespace ft {
 template < class T, class Alloc = std::allocator<T> > 
 class Vector
 {
 	public:
-			typedef   Alloc allocator_type;
-			typedef        T value_type ;
-			allocator_type _alloc;
-			typedef random_access_iterator<value_type> iterator;
-			typedef random_access_iterator<const value_type> const_iterator;
+			typedef	T	value_type;
+			typedef Alloc allocator_type;
+			typedef size_t	size_type;
+			typedef	ft::iterator_op<T> iterator;
+			//typedef ft::reverse_iterator<iterator>	reverse_iterator;
+			typedef	ft::iterator_op<const value_type>			const_iterator;
+			//typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+			typedef typename	allocator_type::pointer	pointer;
+			typedef typename	allocator_type::const_pointer	const_pointer;
+			typedef typename	allocator_type::reference	reference;
+			typedef typename	allocator_type::const_reference const_reference;
+			typedef typename	std::ptrdiff_t							difference_type;
 
 
 		Vector()
@@ -30,6 +38,8 @@ class Vector
 			_data = _alloc.allocate(_size);
 			
 		}
+		~Vector()
+		{}
 
 		iterator begin()
 		{
@@ -47,30 +57,18 @@ class Vector
 		{
 			return const_iterator(_data+_size);
 		}
-		// Vector(Vector const & src);
-		~Vector()
-		{}
-
-		// Vector &	operator=(Vector const & rhs);
-		// T &			operator[](unsigned int index);
-		// T const &	operator[](unsigned int index) const;
-
-		// unsigned int	size(void) const;
-		// void			resize(unsigned int size);
+		
 		void			push_back(T const & value)
 		{
 			// _data[_size] = value;
 			_alloc.construct(_data + _size, value);
 			++_size;
 		}
-		// void			pop_back(void);
-		// void			clear(void);
-		// void			erase(unsigned int index);
-		// void			insert(unsigned int index, T const & value);
-		// void			reverse(void);
-		// void			sort(void);
-		// void			swap(unsigned int index1, unsigned int index2);
-		// void			fill(T const & value);
+		void			pop_back()
+		{
+			_alloc.destroy(_data + _size - 1);
+			--_size;
+		}
 		void			print(void) const
 		{
 			for (unsigned int i = 0; i < _size; i++)
@@ -81,6 +79,7 @@ class Vector
 		T *				_data;
 		unsigned int	_size;
 		unsigned int	_capacity;
+		allocator_type	_alloc;
 };
 
 
