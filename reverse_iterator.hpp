@@ -21,6 +21,7 @@ namespace ft
             template<class Iter>
             reverse_iterator(const reverse_iterator<Iter>& it) : current(it.base()) {}
 
+            
             iterator_type base() const 
             {
                 return current;

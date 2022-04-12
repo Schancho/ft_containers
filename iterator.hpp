@@ -15,9 +15,11 @@ namespace ft
 			typedef typename iterator<std::random_access_iterator_tag, T>::pointer				pointer;
 			typedef typename iterator<std::random_access_iterator_tag, T>::reference			reference;
 			typedef typename iterator<std::random_access_iterator_tag, T>::iterator_category	iterator_category;
+            typedef size_t	size_type;
+            iterator_op(){}
             iterator_op(T *ptr) : _ptr(ptr) {}
             iterator_op(const iterator_op &it) : _ptr(it._ptr) {}
-             operator  iterator_op<const T> ()
+            operator  iterator_op<const T> ()
             {
                 std::cout << "Hey" << std::endl;
                 return iterator_op<const T>(_ptr);
@@ -99,6 +101,11 @@ namespace ft
                 return _ptr;
             }
 
+            reference       operator[](size_type n)
+            {
+                return _ptr[n];
+            }
+
             bool operator==(const iterator_op &it)
             {
                 return _ptr == it._ptr;
@@ -128,10 +135,25 @@ namespace ft
             {
                 return _ptr >= it._ptr;
             }
+            pointer get_pointer(){
+				return _ptr;
+			}
 
         private:
             T *_ptr;
     };
+    template  <typename T>
+    iterator_op<T> operator+(typename iterator_op<T>::difference_type n, iterator_op<T> it)
+    {
+        return it + n;
+    }
+
+    template  <typename T>
+    iterator_op<T> operator-(typename iterator_op<T>::difference_type n, iterator_op<T> it)
+    {
+        return it - n;
+    }
+    
 }
 
 #endif
