@@ -215,6 +215,7 @@ class Vector
 				reserve(n);
 		}
 
+
 		void	reserve(unsigned int cap)
 		{
 			if (cap > max_size())
