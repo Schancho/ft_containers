@@ -1,50 +1,30 @@
-#include "Vector.hpp"
-
-
-// int main()
-// {
-//      ft::Vector<int> v;
-
-
-
-//     v.push_back(1);
-//     v.push_back(2);
-//     v.push_back(25);
-//     ft::Vector<int>::reverse_iterator it =   v.rbegin();
-//     ft::Vector<int>::iterator it1 =   v.begin();
-
-
-//     std::cout << *it << std::endl;
-//     ++it ;
-//     std::cout << *it << std::endl;
-//     ++it ;
-//     std::cout << *it << std::endl;
-//     ++it ;
-//     std::cout << *it << std::endl;
-
-    
-//     // v.print();
-// }
-
+// inserting into a Vector
 #include <iostream>
-//#include <vector>
+#include "Vector.hpp"
 
 int main ()
 {
-   // constructors used in the same order as described above:
-  ft::Vector<int> first;                                // empty vector of ints
-  ft::Vector<int> second (4,100);                       // four ints with value 100
-  ft::Vector<int> third (second.begin(),second.end());  // iterating through second
-  ft::Vector<int> fourth (third);                       // a copy of third
+  ft::Vector<int> myVector (3,100);
+  ft::Vector<int>::iterator it;
 
-  // the iterator constructor can also be used to construct from arrays:
-  int myints[] = {16,2,77,29};
-  ft::Vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
+  it = myVector.begin();
+  it = myVector.insert ( it , 200 );
 
-  std::cout << "The contents of fifth are:";
-  for (ft::Vector<int>::iterator it = fifth.begin(); it != fifth.end(); ++it)
+  myVector.insert (it,2,300);
+
+  // "it" no longer valid, get a new one:
+  it = myVector.begin();
+
+  ft::Vector<int> anotherVector (2,400);
+  myVector.insert (it+2,anotherVector.begin(),anotherVector.end());
+
+  int myarray [] = { 501,502,503 };
+  myVector.insert (myVector.begin(), myarray, myarray+3);
+
+  // std::cout << "myVector contains:";
+  for (it=myVector.begin(); it<myVector.end(); it++)
     std::cout << ' ' << *it;
-  std::cout << '\n';
+  // std::cout << '\n';
 
   return 0;
 }

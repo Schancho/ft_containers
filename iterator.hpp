@@ -21,7 +21,6 @@ namespace ft
             iterator_op(const iterator_op &it) : _ptr(it._ptr) {}
             operator  iterator_op<const T> ()
             {
-                std::cout << "Hey" << std::endl;
                 return iterator_op<const T>(_ptr);
             }
             //  operator  iterator_op< const T> ()  const
@@ -40,6 +39,13 @@ namespace ft
                 ++_ptr;
                 return *this;
             }
+
+
+            T *operator&()
+            {
+                return  _ptr;
+            }
+
 
             iterator_op operator++(int)
             {
@@ -79,7 +85,21 @@ namespace ft
                 return tmp;
             }
 
+            iterator_op operator+(difference_type n) const 
+            {
+                iterator_op tmp(*this);
+                tmp += n;
+                return tmp;
+            }
+
             iterator_op operator-(difference_type n)
+            {
+                iterator_op tmp(*this);
+                tmp -= n;
+                return tmp;
+            }
+
+            iterator_op operator-(difference_type n) const 
             {
                 iterator_op tmp(*this);
                 tmp -= n;
@@ -111,7 +131,17 @@ namespace ft
                 return _ptr == it._ptr;
             }
 
+                 bool operator==(const iterator_op &it) const 
+            {
+                return _ptr == it._ptr;
+            }
+
             bool operator!=(const iterator_op &it)
+            {
+                return _ptr != it._ptr;
+            }   
+
+                    bool operator!=(const iterator_op &it) const 
             {
                 return _ptr != it._ptr;
             }   
@@ -121,7 +151,16 @@ namespace ft
                 return _ptr < it._ptr;
             }
 
+                 bool operator<(const iterator_op &it) const 
+            {
+                return _ptr < it._ptr;
+            }
+
             bool operator>(const iterator_op &it)
+            {
+                return _ptr > it._ptr;
+            }
+               bool operator>(const iterator_op &it) const 
             {
                 return _ptr > it._ptr;
             }
@@ -130,8 +169,16 @@ namespace ft
             {
                 return _ptr <= it._ptr;
             }
+                 bool operator<=(const iterator_op &it) const 
+            {
+                return _ptr <= it._ptr;
+            }
 
             bool operator>=(const iterator_op &it)
+            {
+                return _ptr >= it._ptr;
+            }
+                      bool operator>=(const iterator_op &it) const 
             {
                 return _ptr >= it._ptr;
             }

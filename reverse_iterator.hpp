@@ -21,7 +21,10 @@ namespace ft
             template<class Iter>
             reverse_iterator(const reverse_iterator<Iter>& it) : current(it.base()) {}
 
-            
+            operator  reverse_iterator<const Iterator> ()
+            {
+                return reverse_iterator<const Iterator>(current);
+            }
             iterator_type base() const 
             {
                 return current;
@@ -95,6 +98,7 @@ namespace ft
             {
                 return current == it.current;
             }
+
 
             bool operator!=(const reverse_iterator& it) const
             {

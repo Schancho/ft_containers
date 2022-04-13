@@ -364,26 +364,31 @@ class Vector
 
 		iterator		insert(iterator pos, const value_type& val)
 		{
+			size_t p = std::distance(this->begin(), pos);
 			if (_size == _capacity)
 			{
 				_capacity *= 2;
 				pointer tmp = _alloc.allocate(_capacity);
 				for (size_type i = 0; i < _size; i++)
-					_alloc.construct(tmp+i, _data[i]);
+					_alloc.construct(tmp + i, _data[i]);
 				for (size_type i = 0; i < _size; i++)
 					_alloc.destroy(_data+i);
 				_alloc.deallocate(_data, _capacity);
 				_data = tmp;
 			}
-			for (size_type i = _size; i > pos - _data; i--)
+			for (size_type i = _size; i > p; i--)
 				_alloc.construct(_data+i, _data[i-1]);
-			_alloc.construct(pos.get_pointer(), val);
+			_alloc.construct(_data + p, val);
 			_size++;
-			return pos;
+			return iterator(_data + p);
 		}
 
 		void 	insert(iterator pos, size_type n, const value_type& val)
 		{
+			// size_t p = std::distance(this->begin(), pos);
+			size_t p = &pos - _data;
+						std::cout <<  "==>" <<  p << std::endl;
+
 			if (n > _capacity)
 			{
 				_capacity = n;
@@ -395,11 +400,23 @@ class Vector
 				_alloc.deallocate(_data, _capacity);
 				_data = tmp;
 			}
-			for (size_type i = _size; i > pos - _data; i--)
-				_alloc.construct(_data+i, _data[i-1]);
+			int j = _size;
+			for (size_type i = _size + n; i > _size; i--)
+				_alloc.construct(_data + i, _data[j--]);
 			for (size_type i = 0; i < n; i++)
-				_alloc.construct(_data+pos+i, val);
+				_alloc.construct(_data+ p + i, val);
 			_size += n;
+		}
+		template <class InputIterator>
+    	void insert (iterator position, InputIterator first, InputIterator last , typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = 0)
+		{
+			std::cout << " 3" << std::endl;
+			while (first != last)
+			{
+				this->insert(position, *first);
+				++position;
+				++first;
+			}
 		}
 
 		void	clear()
@@ -415,6 +432,10 @@ class Vector
 				std::cout << _data[i] << std::endl;
 		}
 
+allocator_type get_allocator() const;
+		
+iterator erase (iterator position);
+iterator erase (iterator first, iterator last);
 
 	private:
 		T *				_data;
