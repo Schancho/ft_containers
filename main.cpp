@@ -1,30 +1,31 @@
 // inserting into a Vector
+
 #include <iostream>
 #include "Vector.hpp"
-
-int main ()
+int main()
 {
-  ft::Vector<int> myVector (3,100);
+  // constructors used in the same order as described above:
+  ft::Vector<int> myvector (3,100);
   ft::Vector<int>::iterator it;
 
-  it = myVector.begin();
-  it = myVector.insert ( it , 200 );
+  it = myvector.begin();
+  it = myvector.insert ( it , 200 );
 
-  myVector.insert (it,2,300);
+   myvector.insert (it,2,300);
 
-  // "it" no longer valid, get a new one:
-  it = myVector.begin();
+  // // "it" no longer valid, get a new one:
+  // it = myvector.begin();
 
-  ft::Vector<int> anotherVector (2,400);
-  myVector.insert (it+2,anotherVector.begin(),anotherVector.end());
+  // ft::Vector<int> anothervector (2,400);
+  // myvector.insert (it+2,anothervector.begin(),anothervector.end());
 
-  int myarray [] = { 501,502,503 };
-  myVector.insert (myVector.begin(), myarray, myarray+3);
+  // int myarray [] = { 501,502,503 };
+  // myvector.insert (myvector.begin(), myarray, myarray+3);
 
-  // std::cout << "myVector contains:";
-  for (it=myVector.begin(); it<myVector.end(); it++)
+  std::cout << "myvector contains:";
+  for (it=myvector.begin(); it<myvector.end(); it++)
     std::cout << ' ' << *it;
-  // std::cout << '\n';
-
+  std::cout << '\n';
   return 0;
+
 }

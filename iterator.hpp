@@ -185,7 +185,7 @@ namespace ft
             pointer get_pointer(){
 				return _ptr;
 			}
-
+           
         private:
             T *_ptr;
     };
