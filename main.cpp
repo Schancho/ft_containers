@@ -1,31 +1,21 @@
 // inserting into a Vector
 
 #include <iostream>
-#include "containers/Vector.hpp"
-int main()
-{
-  // constructors used in the same order as described above:
-  ft::Vector<int> myvector (3,100);
-  ft::Vector<int>::iterator it;
-
-  it = myvector.begin();
-  it = myvector.insert ( it , 200 );
-
-   myvector.insert (it,2,300);
-
-  // // "it" no longer valid, get a new one:
-  // it = myvector.begin();
-
-  // ft::Vector<int> anothervector (2,400);
-  // myvector.insert (it+2,anothervector.begin(),anothervector.end());
-
-  // int myarray [] = { 501,502,503 };
-  // myvector.insert (myvector.begin(), myarray, myarray+3);
-
-  std::cout << "myvector contains:";
-  for (it=myvector.begin(); it<myvector.end(); it++)
-    std::cout << ' ' << *it;
-  std::cout << '\n';
-  return 0;
-
+#include "containers/utils/binarySearchTree.hpp"
+int main() {
+  Tree Tree;
+  t_node *root = NULL;
+  root = Tree.insert(root, 33);
+  root = Tree.insert(root, 13);
+  root = Tree.insert(root, 53);
+  root = Tree.insert(root, 9);
+  root = Tree.insert(root, 21);
+  root = Tree.insert(root, 61);
+  root = Tree.insert(root, 8);
+  root = Tree.insert(root, 11);
+  root = Tree.insert(root, 10);
+  Tree.printTree(root, "", true);
+  root = Tree.remove(root, 13);
+  std::cout << "After deleting " << std::endl;
+  Tree.printTree(root, "", true);
 }
