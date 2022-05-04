@@ -1,9 +1,12 @@
 // inserting into a Vector
 
 #include <iostream>
-#include "containers/utils/binarySearchTree.hpp"
+#include "containers/Vector/vector.hpp"
+#include "containers/map/avl.hpp"
+
+
 int main() {
-  Tree Tree;
+  ft::Avl Tree;
   t_node *root = NULL;
   root = Tree.insert(root, 33);
   root = Tree.insert(root, 13);
