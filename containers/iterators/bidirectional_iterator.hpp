@@ -75,9 +75,9 @@ namespace ft
                 return (_node != other._node);
             }
 
-            operator    ft::bidirectional_iterator<pair>() const
+            operator    ft::bidirectional_iterator<Node,pair>() const
             {
-                return ft::bidirectional_iterator<pair>(_node, _root);
+                return ft::bidirectional_iterator<Node,pair>(_node, _root);
             }
         private:
             node_pointer _node;
@@ -101,6 +101,7 @@ namespace ft
             const_bidirectional_iterator(node_pointer node, node_pointer root) : _node(node), _root(root) {}
             const_bidirectional_iterator(const const_bidirectional_iterator &other)
             {
+                //maybe it will give a segmentation fault
                 *this = other;
             }
 
@@ -159,10 +160,10 @@ namespace ft
                 return (_node != other._node);
             }
 
-            operator    ft::const_bidirectional_iterator<pair>() const
-            {
-                return ft::const_bidirectional_iterator<pair>(_node, _root);
-            }
+            // operator    ft::const_bidirectional_iterator<pair>() const
+            // {
+            //     return ft::const_bidirectional_iterator<pair>(_node, _root);
+            // }
 
 
 

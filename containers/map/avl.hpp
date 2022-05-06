@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "pair.hpp"
 
+#include "../iterators/bidirectional_iterator.hpp"
+
 // typedef struct s_node
 // {
 //     int data;
@@ -54,13 +56,14 @@ namespace ft
     template<typename pair>
     Node<pair> *inOrderSuccessor(Node<pair> *node, Node<pair> *root)
     {
+         Node<pair> *current = NULL;
         if (node != NULL)
         {
             return most_left(root);
         }
         else
         {
-            Node<pair> *current = node->parent;
+           current = node->parent;
             while (current != NULL && node == current->right)
             {
                 node = current;
@@ -73,13 +76,14 @@ namespace ft
     template<typename pair>
     Node<pair> *inOrderPredecessor(Node<pair> *node, Node<pair> *root)
     {
+        Node<pair> *current = NULL;
         if (node != NULL)
         {
             return most_right(root);
         }
         else
         {
-            Node<pair> *current = node->parent;
+           current = node->parent;
             while (current != NULL && node == current->left)
             {
                 node = current;
@@ -88,7 +92,7 @@ namespace ft
         }
         return current;
     }
-    template<class key, class Mapped_Type, class Compare = std::less<key>, class Alloc = std::allocator<ft::pair<const key, T> > >
+    template<class key, class Mapped_Type, class Compare = std::less<key>, class Alloc = std::allocator<ft::pair<const key, Mapped_Type> > >
     class  Avl
     {
         
@@ -104,163 +108,386 @@ namespace ft
             typedef size_t size_type;
             //typedef Compare value_compare;
             node_type *root;
+            typedef bidirectional_iterator<node_type, value_type> iterator;
+            typedef const_bidirectional_iterator<node_type, value_type> const_iterator;
+
             private:
                 size_type _size;
-                value_compare _comp;
+                Compare _comp;
                 allocator_type _pair_allocator;
                 node_allocator _node_allocator;
-            
-            node_type *newNode(value_type value)
-            {
-                node_type *tmp = _node_allocator.allocate(1);
-                tmp->data = _pair_allocator.allocate(1);
-                _pair_allocator.construct(tmp->data, value);
-                tmp->left = NULL;
-                tmp->right = NULL;
-                tmp->parent = NULL;
-                tmp->height = 0;
-                tmp->balance_factor = 0;
-                return tmp;
-            }
-            
-            int height(node_type *node)
-            {
-                if (node == NULL)
-                    return 0;
-                return node->height;
-            }
+                
+                node_type *newNode(value_type value)
+                {
+                    node_type *tmp = _node_allocator.allocate(1);
+                    tmp->data = _pair_allocator.allocate(1);
+                    _pair_allocator.construct(tmp->data, value);
+                    tmp->left = NULL;
+                    tmp->right = NULL;
+                    tmp->parent = NULL;
+                    tmp->height = 0;
+                    tmp->balance_factor = 0;
+                    return tmp;
+                }
+                
+                int height(node_type *node)
+                {
+                    if (node == NULL)
+                        return 0;
+                    return 1 + std::max(height(node->left), height(node->right));
+                }
 
-            int max(int a, int b)
-            {
-                return (a > b) ? a : b;
-            }
+                bool __equal(const key_type &key1, const key_type &key2) const 
+                {
+                    return !_comp(key1, key2) && !_comp(key2, key1);
+                }
 
-            int getBalanceFactor(node_type *node)
-            {
-                if (node == NULL)
-                    return 0;
-                return height(node->left) - height(node->right);
-            }
+                bool __exist(node_type *node, const key_type &key1) const
+                {
+                    if (node == NULL)
+                        return false;
+                    if (__equal(node->data->first, key1))
+                        return true;
+                    if (_comp(key1, node->data->first))
+                        return __exist(node->left, key1);
+                    else
+                        return __exist(node->right, key1);
+                }
 
-            node_type *rotateRight(node_type *node)
-            {
-                node_type *tmp = node->left;
-                node->left = tmp->right;
-                if (tmp->right != NULL)
-                    tmp->right->parent = node;
-                tmp->parent = node->parent;
-                if (node->parent == NULL)
-                    root = tmp;
-                else if (node == node->parent->left)
-                    node->parent->left = tmp;
-                else
-                    node->parent->right = tmp;
-                tmp->right = node;
-                node->parent = tmp;
-                node->height = max(height(node->left), height(node->right)) + 1;
-                node->balance_factor = getBalanceFactor(node);
-                tmp->height = max(height(tmp->left), height(tmp->right)) + 1;
-                tmp->balance_factor = getBalanceFactor(tmp);
-                return tmp;
-            }
+                node_type *__find(node_type *node, const key_type &key1) const
+                {
+                    if (node == NULL)
+                        return NULL;
+                    if (__equal(node->data->first, key1))
+                        return node;
+                    if (_comp(key1, node->data->first))
+                        return __find(node->left, key1);
+                    else
+                        return __find(node->right, key1);
+                }
+                
 
-            node_type *rotateLeft(node_type *node)
-            {
-                node_type *tmp = node->right;
-                node->right = tmp->left;
-                if (tmp->left != NULL)
-                    tmp->left->parent = node;
-                tmp->parent = node->parent;
-                if (node->parent == NULL)
-                    root = tmp;
-                else if (node == node->parent->left)
-                    node->parent->left = tmp;
-                else
-                    node->parent->right = tmp;
-                tmp->left = node;
-                node->parent = tmp;
-                node->height = max(height(node->left), height(node->right)) + 1;
-                node->balance_factor = getBalanceFactor(node);
-                tmp->height = max(height(tmp->left), height(tmp->right)) + 1;
-                tmp->balance_factor = getBalanceFactor(tmp);
-                return tmp;
-            }
+                int max(int a, int b)
+                {
+                    return (a > b) ? a : b;
+                }
 
-            node_type *rotateLeftRight(node_type *node)
-            {
-                node->left = rotateLeft(node->left);
-                return rotateRight(node);
-            }
+                int getBalanceFactor(node_type *node)
+                {
+                    if (node == NULL)
+                        return 0;
+                    return height(node->left) - height(node->right);
+                }
 
-            node_type *rotateRightLeft(node_type *node)
-            {
-                node->right = rotateRight(node->right);
-                return rotateLeft(node);
-            }
+                node_type *rotateRight(node_type *node)
+                {
+                    std::cout << "Right Rotate" << std::endl;
+                    node_type *tmp = node->left;
+                    if (tmp == NULL)
+                        return node;
+                    node->left = tmp->right;
+                    if (tmp->right != NULL)
+                        tmp->right->parent = node;
+                    tmp->parent = node->parent;
+                    if (node->parent == NULL)
+                        root = tmp;
+                    else if (node == node->parent->left)
+                        node->parent->left = tmp;
+                    else
+                        node->parent->right = tmp;
+                    tmp->right = node;
+                    node->parent = tmp;
+                    node->height = max(height(node->left), height(node->right)) + 1;
+                    node->balance_factor = getBalanceFactor(node);
+                    tmp->height = max(height(tmp->left), height(tmp->right)) + 1;
+                    tmp->balance_factor = getBalanceFactor(tmp);
+                    return tmp;
+                }
 
-            node_type *insert(node_type *node, value_type value)
-            {
-                if (node == NULL)
-                    return newNode(value);
-                if (_comp(value, node->data->first))
-                    node->left = insert(node->left, value);
-                else if (_comp(node->data->first, value))
-                    node->right = insert(node->right, value);
-                else
+                node_type *rotateLeft(node_type *node)
+                {
+                                        std::cout << "Left Rotate" << std::endl;
+
+                    node_type *tmp = node->right;
+
+                    if (tmp == NULL)
+                        return node;
+                    node->right = tmp->left;
+                    if (tmp->left != NULL)
+                        tmp->left->parent = node;
+                    tmp->parent = node->parent;
+                    if (node->parent == NULL)
+                        root = tmp;
+                    else if (node == node->parent->left)
+                        node->parent->left = tmp;
+                    else
+                        node->parent->right = tmp;
+                    tmp->left = node;
+                    node->parent = tmp;
+                    node->height = max(height(node->left), height(node->right)) + 1;
+                    node->balance_factor = getBalanceFactor(node);
+                    tmp->height = max(height(tmp->left), height(tmp->right)) + 1;
+                    tmp->balance_factor = getBalanceFactor(tmp);
+                    return tmp;
+                }
+
+                node_type *rotateLeftRight(node_type *node)
+                {
+
+                    node->left = rotateLeft(node->left);
+                    return rotateRight(node);
+                }
+
+                node_type *rotateRightLeft(node_type *node)
+                {
+                    node->right = rotateRight(node->right);
+                    return rotateLeft(node);
+                }
+               
+                node_type *insert_helper(node_type *node, value_type value)
+                {
+                    if (root == NULL)
+                    {
+                        root = newNode(value);
+                        return root;
+                    }
+                    if (node == NULL)
+                        return  newNode(value);
+                    if (_comp(value.first, node->data->first))
+                    {
+                        node->left = insert_helper(node->left, value);
+                        node->left->parent = node;
+                    }
+                    else if (_comp(node->data->first, value.first))
+                    {
+                        node->right = insert_helper(node->right, value);
+                        node->right->parent = node;
+                    }
+                    else
+                        return node;
+                    node->height = max(height(node->left), height(node->right)) + 1;
+                    node->balance_factor = getBalanceFactor(node);
+                    if (node->balance_factor > 1)
+                    {
+                        if (getBalanceFactor(node->left) >= 0)
+                            node =  rotateRight(node);
+                        else
+                            node =  rotateLeftRight(node); // rotateRightLeft
+                    }
+                    else if (node->balance_factor < -1)
+                    {
+                        if (getBalanceFactor(node->right) < 0)
+                            node =  rotateLeft(node);
+                        else
+                            node =  rotateRightLeft(node); // rotateRightLeft
+                    }
                     return node;
-                node->height = max(height(node->left), height(node->right)) + 1;
-                node->balance_factor = getBalanceFactor(node);
-                if (node->balance_factor == 2)
-                {
-                    if (height(node->left->left) >= height(node->left->right))
-                        return rotateRight(node);
-                    else
-                        return rotateLeftRight(node);
                 }
-                if (node->balance_factor == -2)
+
+         
+
+                node_type   *deleteNode_helper(node_type *node, const key_type &key1)
                 {
-                    if (height(node->right->right) >= height(node->right->left))
-                        return rotateLeft(node);
-                    else
-                        return rotateRightLeft(node);
-                }
-                return node;
-            }
-
-            Avl() : _size(0), _comp(), _pair_allocator(), _node_allocator(), root(NULL)
-            {
-            }
-
-            Avl(const Avl &other) : _size(other._size), _comp(other._comp), _pair_allocator(other._pair_allocator), _node_allocator(other._node_allocator), root(NULL)
-            {
-                if (other.root == NULL)
-                    return;
-                root = newNode(other.root->data->first);
-                root->data = other.root->data;
-                root->left = insert(root->left, other.root->left->data->first);
-                root->right = insert(root->right, other.root->right->data->first);
-            }
-
-            Avl &operator=(const Avl &other)
-            {
-                if (this != &other)
-                {
-                    _size = other._size;
-                    _comp = other._comp;
-                    _pair_allocator = other._pair_allocator;
-                    _node_allocator = other._node_allocator;
-                    if (other.root == NULL)
-                        root = NULL;
+                    if (node == NULL)
+                        return NULL;
+                    if (_comp(key1, node->data->first))
+                        node->left = deleteNode_helper(node->left, key1);
+                    else if (_comp(node->data->first, key1))
+                        node->right = deleteNode_helper(node->right, key1);
                     else
                     {
-                        root = newNode(other.root->data->first);
-                        root->data = other.root->data;
-                        root->left = insert(root->left, other.root->left->data->first);
-                        root->right = insert(root->right, other.root->right->data->first);
+                        if (node->left == NULL && node->right == NULL)
+                        {
+                            node_type *tmp = node;
+                            // _pair_allocator.destroy(tmp->data);
+                            // _pair_allocator.deallocate(tmp->data, 1);
+                            // _node_allocator.deallocate(tmp, 1);
+                            node = NULL;
+                            return node;
+                        }
+                        else if (node->left == NULL)
+                        {
+                            node_type *tmp = node;
+                            node = node->right;
+                            _pair_allocator.destroy(tmp->data);
+                            _pair_allocator.deallocate(tmp->data, 1);
+                            _node_allocator.deallocate(tmp, 1);
+                            //free(tmp);
+                            return node;
+                        }
+                        else if (node->right == NULL)
+                        {
+                            node_type *tmp = node;
+                            node = node->left;
+                            _pair_allocator.destroy(tmp->data);
+                            _pair_allocator.deallocate(tmp->data, 1);
+                            _node_allocator.deallocate(tmp, 1);
+                            //free(tmp);
+                            return node;
+                        }
+                        else
+                        {
+                            node_type *tmp = node->right;
+                            while (tmp->left != NULL)
+                                tmp = tmp->left;
+                            node->data = tmp->data;
+                            // node->data->first = tmp->data->first;
+                            // node->data->second = tmp->data->second;
+                            node->right = deleteNode_helper(node->right, tmp->data->first);
+                        }
                     }
+                    if (node == NULL)
+                        return node;
+                    node->height = max(height(node->left), height(node->right)) + 1;
+                    node->balance_factor = getBalanceFactor(node);
+                    if (node->balance_factor > 1)
+                    {
+                        if (getBalanceFactor(node->left) >= 0)
+                            node =  rotateRight(node);
+                        else
+                            node =  rotateLeftRight(node); // rotateRightLeft
+                    }
+                    else if (node->balance_factor < -1)
+                    {
+                        if (getBalanceFactor(node->right) < 0)
+                            node =  rotateLeft(node);
+                        else
+                            node =  rotateRightLeft(node); // rotateRightLeft
+                    }
+                    return node;
                 }
-                return *this;
+
+                    // node->balance_factor = getBalanceFactor(node);
+
+                    // if (node->balance_factor > 1)
+                    // {
+                    //     if (getBalanceFactor(node->left) >= 0)
+                    //         node =  rotateRight(node);
+                    //     else
+                    //         node =  rotateLeftRight(node); // rotateRightLeft
+                    // }
+                    // else if (node->balance_factor < -1)
+                    // {
+                    //     if (getBalanceFactor(node->right) < 0)
+                    //         node =  rotateLeft(node);
+                    //     else
+                    //         node =  rotateRightLeft(node); // rotateRightLeft
+                    // }
+                    // return node;
+               // }
+
+            public:    
+
+                Avl() : _size(0), _comp(), _pair_allocator(), _node_allocator(), root(NULL)
+                {
+                }
+
+                Avl(const Avl &other) : _size(other._size), root(NULL)
+                {
+                    *this = other;
+                }
+
+                Avl &operator=(const Avl &other)
+                {
+                    if (this != &other)
+                    {
+                        _size = other._size;
+                        _comp = other._comp;
+                        _pair_allocator = other._pair_allocator;
+                        _node_allocator = other._node_allocator;
+                        if (other.root == NULL)
+                            root = NULL;
+                        else
+                        {
+                            root = newNode(other.root->data->first);
+                            root->data = other.root->data;
+                            root->left = insert(root->left, other.root->left->data->first);
+                            root->right = insert(root->right, other.root->right->data->first);
+                        }
+                    }
+                    return *this;
+                }
+                
+                void    freee(node_type *node)
+                {
+                    if (node == NULL)
+                        return;
+                    freee(node->left);
+                    freee(node->right);
+                    _pair_allocator.destroy(node->data);
+                    _pair_allocator.deallocate(node->data, 1);
+                    _node_allocator.deallocate(node, 1);
+                }
+
+                void    clear()
+                {
+                    freee(root);
+                    root = NULL;
+                    _size = 0;
+
+                }
+
+                bool    empty() const
+                {
+                    return _size == 0;
+                }
+
+                // node_type  *find(const key_type &key1)
+                // {
+                //     return __find(root, key1);
+                // }
+                bool    exists(const key_type &key1) 
+                {
+                    return (__exist(root, key1));
+                }
+
+
+            bool   insert(const value_type &value)
+            {
+                if (exists(value.first))
+                    return false;
+                root = insert_helper(root, value);
+                _size++;
+                return true;
             }
+
+            int    height() const
+            {
+                if (root == NULL)
+                    return 0;
+                return root->height;
+            }
+
+
+           node_type   *delete_node(const key_type &key1)
+           {
+               return deleteNode_helper(root, key1);
+           }
+
+        void printBT(const std::string& prefix, const node_type* node, bool isLeft)
+        {
+            if( node != nullptr )
+            {
+                std::cout << prefix;
+
+                std::cout << (isLeft ? "L├──" : "R└──" );
+
+                // print the value of the node
+                std::cout << node->data->first << std::endl;
+
+                // enter the next tree level - left and right branch
+                if (node)
+                printBT( prefix + (isLeft ? "│   " : "    "), node->left, true);
+                printBT( prefix + (isLeft ? "│   " : "    "), node->right, false);
+            }
+        }
+
+void print()
+{
+    // ptint value or root in stout
+    printBT("", root, true);    
+    std::cout<< std::endl;
+}
 
     };
 }

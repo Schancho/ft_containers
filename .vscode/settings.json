@@ -62,6 +62,8 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "typeinfo": "cpp",
-        "memory_resource": "cpp"
+        "memory_resource": "cpp",
+        "clocale": "cpp",
+        "__functional_03": "cpp"
     }
 }
