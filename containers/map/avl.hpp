@@ -181,7 +181,6 @@ namespace ft
 
                 node_type *rotateRight(node_type *node)
                 {
-                    std::cout << "Right Rotate" << std::endl;
                     node_type *tmp = node->left;
                     if (tmp == NULL)
                         return node;
@@ -206,7 +205,6 @@ namespace ft
 
                 node_type *rotateLeft(node_type *node)
                 {
-                                        std::cout << "Left Rotate" << std::endl;
 
                     node_type *tmp = node->right;
 
@@ -441,7 +439,20 @@ namespace ft
                     return (__exist(root, key1));
                 }
 
-
+                node_type   search(node_type *node, const key_type &key1)
+                {
+                    if (node == NULL)
+                        return NULL;
+                    if (key1 == node->data->first)
+                        return node;
+                    else
+                    {
+                        if (_comp(key1, node->data->first))
+                            return search(node->left, key1);
+                        else
+                            return search(node->right, key1);
+                    }
+                }
             bool   insert(const value_type &value)
             {
                 if (exists(value.first))
@@ -463,6 +474,39 @@ namespace ft
            {
                return deleteNode_helper(root, key1);
            }
+
+           node_type    *_max(node_type *node)
+           {
+               if (node->right == NULL)
+                   return node;
+                return _max(node->right);
+           }
+
+              node_type    *_min(node_type *node)
+              {
+                if (node->left == NULL)
+                     return node;
+                 return _min(node->left);
+              }
+
+              void  swap(Avl &other)
+              {
+                  std::swap(root, other.root);
+                    std::swap(_size, other._size);
+                    std::swap(_comp, other._comp);
+              }
+
+              bool empty() const
+              {
+                  return _size == 0;
+              }
+
+                size_t size() const
+                {
+                    return _size;
+                }
+
+                
 
         void printBT(const std::string& prefix, const node_type* node, bool isLeft)
         {
