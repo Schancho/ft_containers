@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include "pair.hpp"
-
+#include "make_pair.hpp"
 #include "../iterators/bidirectional_iterator.hpp"
 
 // typedef struct s_node
@@ -397,7 +397,7 @@ namespace ft
                             root = NULL;
                         else
                         {
-                            root = newNode(other.root->data->first);
+                            root = newNode(other.root);
                             root->data = other.root->data;
                             root->left = insert(root->left, other.root->left->data->first);
                             root->right = insert(root->right, other.root->right->data->first);
@@ -439,7 +439,7 @@ namespace ft
                     return (__exist(root, key1));
                 }
 
-                node_type   search(node_type *node, const key_type &key1)
+                node_type   *search(node_type *node, const key_type &key1)
                 {
                     if (node == NULL)
                         return NULL;
@@ -470,9 +470,13 @@ namespace ft
             }
 
 
-           node_type   *delete_node(const key_type &key1)
+           bool   remove(const key_type &key1)
            {
-               return deleteNode_helper(root, key1);
+               if (!exists(key1))
+                   return false;
+               root =  deleteNode_helper(root, key1);
+                _size--;
+                return true;
            }
 
            node_type    *_max(node_type *node)
@@ -496,15 +500,87 @@ namespace ft
                     std::swap(_comp, other._comp);
               }
 
-              bool empty() const
-              {
-                  return _size == 0;
-              }
+           
 
                 size_t size() const
                 {
                     return _size;
                 }
+            
+            node_type *successor(node_type *node) const
+            {
+                if (node->right != NULL)
+                    return _min(node->right);
+                node_type *tmp = node->parent;
+                while (tmp != NULL && node == tmp->right)
+                {
+                    node = tmp;
+                    tmp = tmp->parent;
+                }
+                return tmp;
+            }
+
+            node_type *lower_bound(node_type *node, key_type key1)
+            {
+                node_type *tmp = most_left(node);
+                while (tmp)
+                {
+                    if (tmp->data->first >= key1)
+                        return tmp;
+                    tmp = successor(tmp);
+                }
+                return NULL;
+            }
+
+            node_type *lower_bound(node_type *node, key_type key1) const
+            {
+                node_type *tmp = most_left(node);
+                while (tmp)
+                {
+                    if (tmp->data->first >= key1)
+                        return tmp;
+                    tmp = successor(tmp);
+                }
+                return NULL;
+            }
+
+            node_type *upper_bound(node_type *node, key_type key1)
+            {
+                node_type *tmp = most_left(node);
+                while (tmp)
+                {
+                    if (tmp->data->first > key1)
+                        return tmp;
+                    tmp = successor(tmp);
+                }
+                return NULL;
+            }
+
+            node_type *upper_bound(node_type *node, key_type key1) const
+            {
+                node_type *tmp = most_left(node);
+                while (tmp)
+                {
+                    if (tmp->data->first > key1)
+                        return tmp;
+                    tmp = successor(tmp);
+                }
+                return NULL;
+            }
+
+            pair<iterator, iterator> equal_range(const key_type &key1)
+            {
+                ft::pair<iterator, iterator> ret = ft::make_pair(lower_bound(key1), upper_bound(key1));
+                return ret;
+            }
+
+            pair<const_iterator, const_iterator> equal_range(const key_type &key1) const
+            {
+                ft::pair<const_iterator, const_iterator> ret = ft::make_pair(lower_bound(key1), upper_bound(key1));
+                return ret;
+            }
+
+
 
                 
 
