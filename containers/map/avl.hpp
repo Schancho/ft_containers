@@ -387,22 +387,9 @@ namespace ft
 
                 Avl &operator=(const Avl &other)
                 {
-                    if (this != &other)
-                    {
-                        _size = other._size;
-                        _comp = other._comp;
-                        _pair_allocator = other._pair_allocator;
-                        _node_allocator = other._node_allocator;
-                        if (other.root == NULL)
-                            root = NULL;
-                        else
-                        {
-                            root = newNode(other.root);
-                            root->data = other.root->data;
-                            root->left = insert(root->left, other.root->left->data->first);
-                            root->right = insert(root->right, other.root->right->data->first);
-                        }
-                    }
+                    clear();
+                    node_type *tmp = other.root;
+                    copy(tmp);
                     return *this;
                 }
                 
@@ -425,6 +412,15 @@ namespace ft
 
                 }
 
+                void    copy(node_type *node)
+                {
+                    if (node != NULL)
+                    {
+                        insert(*(node->data));
+                        copy(node->left);
+                        copy(node->right);
+                    }
+                }
                 bool    empty() const
                 {
                     return _size == 0;

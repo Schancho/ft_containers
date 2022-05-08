@@ -160,7 +160,7 @@ namespace ft
                     ft::pair<key_type, mapped_type> p = ft::make_pair(key1, mapped_type());
                     _tree.insert(p);
                     node_type *tmp = _tree.search(_tree.root, key1);
-                    return tmp->data.second;
+                    return tmp->data->second;
                 }
 
                 void    erase(iterator pos)
