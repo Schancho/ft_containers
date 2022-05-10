@@ -20,21 +20,20 @@ struct classcomp {
 
 int main ()
 {
-  ft::map<char,int> first;
+   ft::map<char,int> mymap;
 
-  first['a']=10;
-  first['b']=30;
-  first['c']=50;
-  first['d']=70;
+  mymap['x'] = 100;
+  mymap['y'] = 200;
+  mymap['z'] = 300;
 
-  ft::map<char,int> second (first.begin(),first.end());
+  // show content:
+  ft::map<char,int>::reverse_iterator rit;
+  for (rit=mymap.rbegin(); rit!=mymap.rend(); ++rit)
+  {
+    std::cout << rit->first << " => " << rit->second << '\n';
+    std::cout << "before segfault"<< std::endl;
 
-  ft::map<char,int> third (second);
-
-  ft::map<char,int,classcomp> fourth;                 // class as Compare
-
-  bool(*fn_pt)(char,char) = fncomp;
-  ft::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
+  }
 
   return 0;
 }

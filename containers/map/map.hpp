@@ -2,9 +2,11 @@
 
 #include <iterator>
 #include "../iterators/bidirectional_iterator.hpp"
+#include "../iterators/reverse_iterator.hpp"
 #include "avl.hpp"
 #include "../utils/lexicographical_compare.hpp"
 #include "../utils/equal.hpp"
+#include "../vector/Vector.hpp"
 #include <vector>
 
 namespace ft
@@ -65,10 +67,19 @@ namespace ft
                 map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(),
                     const allocator_type &alloc = allocator_type()) : _tree(), _compare(comp), _allocator(alloc)
                 {
+                    int i= 0;
                     while (first != last)
                     {
+                        
+                       // std::cout << "debug1: "<< first->first << std::endl;
+                        
                         insert(*first);
+                        //std::cout << "debug2: "<< first->second << std::endl;
                         ++first;
+                        //std::cout << "debug3: "<< first->second << std::endl;
+                        // i++;
+                        // if (i == 6)
+                        //     break;
                     }
                 }
 
@@ -98,30 +109,32 @@ namespace ft
                 iterator begin()
                 {
                     node_type *tmp = _tree._min(_tree.root);
-                    return (iterator(tmp, _tree.root)); //casting
+                    return (iterator(tmp, const_cast<node_type **>(&_tree.root))); //casting
                 }
 
                 const_iterator begin() const
                 {
                     node_type *tmp = _tree._min(_tree.root);
-                    return (const_iterator(tmp, _tree.root)); //casting
+                    return (const_iterator(tmp, const_cast<node_type **>(&_tree.root))); //casting
                 }
 
                 // iterator end
                 iterator end()
                 {
-                    return iterator(NULL, _tree.root);
+                    return iterator(NULL, &_tree.root);
                 }
 
                 const_iterator end() const
                 {
-                    return const_iterator(NULL, _tree.root);
+                    return const_iterator(NULL, const_cast<node_type **>(&_tree.root));
                 }
 
                 // reverse iterator rbegin
                 reverse_iterator rbegin()
                 {
+                    std::cout << "rbegin" << std::endl;
                     return reverse_iterator(end());
+                    std::cout << "rbegin2" << std::endl;
                 }
 
                 const_reverse_iterator rbegin() const
@@ -132,7 +145,10 @@ namespace ft
                 // reverse iterator rend
                 reverse_iterator rend()
                 {
-                    return reverse_iterator(begin());
+                    std::cout << "rend" << std::endl;
+                    std::cout << begin()->first << std::endl;
+                    return reverse_iterator(++begin());//segfauuuuuuult
+                    std::cout << "rend2" << std::endl;
                 }
                 
                 const_reverse_iterator rend() const
@@ -176,10 +192,17 @@ namespace ft
 
                 void erase(iterator first, iterator last)
                 {
+                   std::vector<key_type> keys;
                     while (first != last)
                     {
-                        erase(first);
+                        keys.push_back(first->first);
                         ++first;
+                    }
+                    typename std::vector<key_type>::iterator it = keys.begin();
+                    while (it != keys.end())
+                    {
+                        erase(*it);
+                        ++it;
                     }
                 }
 
@@ -195,9 +218,14 @@ namespace ft
                     this->erase(begin(), end());
                 }
 
+                key_compare key_comp() const
+                {
+                    return _compare;
+                }
+
                 value_compare   value_comp() const
                 {
-                    return this->_compare;
+                    return value_compare(_compare);
                 }
 
                 iterator    find(const key_type &key1)
@@ -240,11 +268,11 @@ namespace ft
                     {
                         _tree.insert(p);
                         tmp = _tree.search(_tree.root, val.first);
-                        return (pair<iterator, bool>(iterator(tmp, _tree.root), true)); //casting
+                        return (pair<iterator, bool>(iterator(tmp, const_cast<node_type **>(&_tree.root)), true)); //casting
                     }
                     else
                     {
-                        return (pair<iterator, bool>(iterator(tmp, _tree.root), false)); //casting
+                        return (pair<iterator, bool>(iterator(tmp, const_cast<node_type **>(&_tree.root)), false)); //casting
                     }
                 }
 
@@ -255,7 +283,6 @@ namespace ft
                     for (; first != last; ++first)
                     {
                         insert(*first);
-                        std::cout << *first << std::endl;
                     }
                 }
 
@@ -300,6 +327,18 @@ namespace ft
                 void   print()
                 {
                     _tree.print();
+                }
+
+                pair<iterator, iterator> equal_range(const key_type &key1)
+                {
+                    ft::pair<iterator, iterator> p = ft::make_pair(lower_bound(key1), upper_bound(key1));
+                    return p;
+                }
+
+                pair<const_iterator, const_iterator> equal_range(const key_type &key1) const
+                {
+                    ft::pair<const_iterator, const_iterator> p = ft::make_pair(lower_bound(key1), upper_bound(key1));
+                    return p;
                 }
     };
     template <class k, class T, class Comp, class Allocat>

@@ -57,17 +57,23 @@ namespace ft
     Node<pair> *inOrderSuccessor(Node<pair> *node, Node<pair> *root)
     {
          Node<pair> *current = NULL;
-        if (node != NULL)
+        if (node == NULL)
         {
             return most_left(root);
         }
         else
         {
-           current = node->parent;
-            while (current != NULL && node == current->right)
+            if (node->right != NULL)
+                return most_left(node->right);
+            else
             {
-                node = current;
-                current = current->parent;
+                Node<pair> *parent = node->parent;
+                while (parent != NULL && node == parent->right)
+                {
+                    node = parent;
+                    parent = parent->parent;
+                }
+                return parent;
             }
         }
         return current;
@@ -77,7 +83,7 @@ namespace ft
     Node<pair> *inOrderPredecessor(Node<pair> *node, Node<pair> *root)
     {
         Node<pair> *current = NULL;
-        if (node != NULL)
+        if (node == NULL)
         {
             return most_right(root);
         }
@@ -95,8 +101,6 @@ namespace ft
     template<class key, class Mapped_Type, class Compare = std::less<key>, class Alloc = std::allocator<ft::pair<const key, Mapped_Type> > >
     class  Avl
     {
-        
-
         public:
             typedef Mapped_Type mapped_type;
             typedef key key_type;
@@ -294,45 +298,81 @@ namespace ft
                         node->right = deleteNode_helper(node->right, key1);
                     else
                     {
-                        if (node->left == NULL && node->right == NULL)
+                        if (node->left == NULL && node->right)
                         {
-                            node_type *tmp = node;
-                            // _pair_allocator.destroy(tmp->data);
-                            // _pair_allocator.deallocate(tmp->data, 1);
-                            // _node_allocator.deallocate(tmp, 1);
+                            node->right->parent = node->parent;
+                            _pair_allocator.destroy(node->data);
+                            _pair_allocator.construct(node->data, *(node->right->data));
+                            _pair_allocator.destroy(node->right->data);
+                            _pair_allocator.deallocate(node->right->data, 1);
+                            _node_allocator.deallocate(node->right, 1);
+                            node->right = NULL;
+                        }
+                        else if (node->right == NULL && node->left)
+                        {
+                            node->left->parent = node->parent;
+                            _pair_allocator.destroy(node->data);
+                            _pair_allocator.construct(node->data, *(node->left->data));
+                            _pair_allocator.destroy(node->left->data);
+                            _pair_allocator.deallocate(node->left->data, 1);
+                            _node_allocator.deallocate(node->left, 1);
+                            node->left = NULL;
+                        }
+                        else if (!node->right && !node->left)
+                        {
+                            _pair_allocator.destroy(node->data);
+                            _pair_allocator.deallocate(node->data, 1);
+                            _node_allocator.deallocate(node, 1);
                             node = NULL;
-                            return node;
-                        }
-                        else if (node->left == NULL)
-                        {
-                            node_type *tmp = node;
-                            node = node->right;
-                            _pair_allocator.destroy(tmp->data);
-                            _pair_allocator.deallocate(tmp->data, 1);
-                            _node_allocator.deallocate(tmp, 1);
-                            //free(tmp);
-                            return node;
-                        }
-                        else if (node->right == NULL)
-                        {
-                            node_type *tmp = node;
-                            node = node->left;
-                            _pair_allocator.destroy(tmp->data);
-                            _pair_allocator.deallocate(tmp->data, 1);
-                            _node_allocator.deallocate(tmp, 1);
-                            //free(tmp);
-                            return node;
+                            return NULL;
                         }
                         else
                         {
-                            node_type *tmp = node->right;
-                            while (tmp->left != NULL)
-                                tmp = tmp->left;
-                            node->data = tmp->data;
-                            // node->data->first = tmp->data->first;
-                            // node->data->second = tmp->data->second;
+                            node_type *tmp = most_left(node->right);
+                            _pair_allocator.destroy(node->data);
+                            _pair_allocator.construct(node->data, *(tmp->data));
                             node->right = deleteNode_helper(node->right, tmp->data->first);
                         }
+
+                        // if (node->left == NULL && node->right == NULL)
+                        // {
+                        //     node_type *tmp = node;
+                        //     // _pair_allocator.destroy(tmp->data);
+                        //     // _pair_allocator.deallocate(tmp->data, 1);
+                        //     // _node_allocator.deallocate(tmp, 1);
+                        //     node = NULL;
+                        //     return node;
+                        // }
+                        // else if (node->left == NULL)
+                        // {
+                        //     node_type *tmp = node;
+                        //     node = node->right;
+                        //     _pair_allocator.destroy(tmp->data);
+                        //     _pair_allocator.deallocate(tmp->data, 1);
+                        //     _node_allocator.deallocate(tmp, 1);
+                        //     //free(tmp);
+                        //     return node;
+                        // }
+                        // else if (node->right == NULL)
+                        // {
+                        //     node_type *tmp = node;
+                        //     node = node->left;
+                        //     _pair_allocator.destroy(tmp->data);
+                        //     _pair_allocator.deallocate(tmp->data, 1);
+                        //     _node_allocator.deallocate(tmp, 1);
+                        //     //free(tmp);
+                        //     return node;
+                        // }
+                        // else
+                        // {
+                        //     node_type *tmp = node->right;
+                        //     while (tmp->left != NULL)
+                        //         tmp = tmp->left;
+                        //     node->data = tmp->data;
+                        //     // node->data->first = tmp->data->first;
+                        //     // node->data->second = tmp->data->second;
+                        //     node->right = deleteNode_helper(node->right, tmp->data->first);
+                        // }
                     }
                     if (node == NULL)
                         return node;
@@ -435,7 +475,7 @@ namespace ft
                     return (__exist(root, key1));
                 }
 
-                node_type   *search(node_type *node, const key_type &key1)
+                node_type   *search(node_type *node, const key_type &key1) const
                 {
                     if (node == NULL)
                         return NULL;
@@ -466,7 +506,7 @@ namespace ft
             }
 
 
-           bool   remove(const key_type &key1)
+           bool   remove(key_type key1)
            {
                if (!exists(key1))
                    return false;
@@ -482,7 +522,7 @@ namespace ft
                 return _max(node->right);
            }
 
-              node_type    *_min(node_type *node)
+              node_type    *_min(node_type *node) const
               {
                 if (node->left == NULL)
                      return node;

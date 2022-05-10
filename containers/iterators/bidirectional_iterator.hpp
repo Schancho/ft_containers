@@ -16,7 +16,7 @@ namespace ft
             typedef std::ptrdiff_t difference_type;
 
             bidirectional_iterator()  : _node(NULL), _root(NULL) {}
-            bidirectional_iterator(node_pointer node, node_pointer root) : _node(node), _root(root) {}
+            bidirectional_iterator(node_pointer node, node_pointer *root) : _node(node), _root(root) {}
             bidirectional_iterator(const bidirectional_iterator &other)
             {
                 *this = other;
@@ -34,34 +34,35 @@ namespace ft
                 return (*(_node->data));
             }
 
-            pointer operator->() const
+            pair_pointer operator->() const
             {
                 return _node->data;
             }
 
             bidirectional_iterator &operator++()
             {
-                _node = inOrderSuccessor(_node, _root);
+                _node = inOrderSuccessor(_node, *_root);
                 return *this;
             }
 
             bidirectional_iterator operator++(int)
             {
                 bidirectional_iterator tmp(*this);
-                _node = inOrderSuccessor(_node, _root);
-                return tmp;
+                _node = inOrderSuccessor(_node, *_root);
+                return tmp;;
+                
             }
 
             bidirectional_iterator &operator--()
             {
-                _node = inOrderPredecessor(_node, _root);
+                _node = inOrderPredecessor(_node, *_root);
                 return *this;
             }
 
             bidirectional_iterator operator--(int)
             {
                 bidirectional_iterator tmp(*this);
-                _node = inOrderPredecessor(_node, _root);
+                _node = inOrderPredecessor(_node, *_root);
                 return tmp;
             }
 
@@ -81,7 +82,7 @@ namespace ft
             }
         private:
             node_pointer _node;
-            node_pointer _root;
+            node_pointer *_root;
     };
     template< typename Node, typename pair>
     class const_bidirectional_iterator
@@ -98,11 +99,18 @@ namespace ft
             typedef ft::bidirectional_iterator<Node, pair> bidirectional_iterator;
 
             const_bidirectional_iterator()  : _node(NULL), _root(NULL) {}
-            const_bidirectional_iterator(node_pointer node, node_pointer root) : _node(node), _root(root) {}
-            const_bidirectional_iterator(const const_bidirectional_iterator &other)
+            const_bidirectional_iterator(node_pointer node, node_pointer *root) : _node(node), _root(root) {}
+            const_bidirectional_iterator(const bidirectional_iterator &other)
             {
                 //maybe it will give a segmentation fault
-                *this = other;
+                _node = other._node;
+                _root = other._root;
+            }
+
+            const_bidirectional_iterator(const const_bidirectional_iterator &other)
+            {
+                _node = other._node;
+                _root = other._root;
             }
 
             const_bidirectional_iterator &operator=(const const_bidirectional_iterator &other)
@@ -133,7 +141,9 @@ namespace ft
             const_bidirectional_iterator operator++(int)
             {
                 const_bidirectional_iterator tmp(*this);
-                _node = inOrderSuccessor(_node, _root);
+
+                // _node = inOrderSuccessor(_node, _root);
+                ++(*this);
                 return tmp;
             }
 
@@ -169,7 +179,7 @@ namespace ft
 
         private:
             node_pointer _node;
-            node_pointer _root;
+            node_pointer *_root;
     };
 
 }
