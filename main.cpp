@@ -20,20 +20,24 @@ struct classcomp {
 
 int main ()
 {
-   ft::map<char,int> mymap;
+  ft::map<char,int> foo,bar;
 
-  mymap['x'] = 100;
-  mymap['y'] = 200;
-  mymap['z'] = 300;
+  foo['x']=100;
+  foo['y']=200;
 
-  // show content:
-  ft::map<char,int>::reverse_iterator rit;
-  for (rit=mymap.rbegin(); rit!=mymap.rend(); ++rit)
-  {
-    std::cout << rit->first << " => " << rit->second << '\n';
-    std::cout << "before segfault"<< std::endl;
+  bar['a']=11;
+  bar['b']=22;
+  bar['c']=33;
 
-  }
+  swap(foo,bar);
+
+  std::cout << "foo contains:\n";
+  for (ft::map<char,int>::iterator it=foo.begin(); it!=foo.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
+
+  std::cout << "bar contains:\n";
+  for (ft::map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
 
   return 0;
 }

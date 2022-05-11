@@ -38,19 +38,35 @@ namespace ft
     template<typename pair>
     Node<pair> *most_left(Node<pair> *root)
     {
-        Node<pair> *current = root;
-        while (current->left != NULL)
-            current = current->left;
-        return current;
+        if (!root)
+            return root;
+        while (root->left)
+        {
+            // std::cout << "parrent " << root->data->first << std::endl;
+            // std::cout << "left->first " << root->left->data->first << std::endl;
+            // std::cout << "left->second " << root->left->data->second << std::endl;
+            root = root->left;
+        }
+        return root;
+        
+        // Node<pair> *current = root;
+        // while (current->left != NULL)
+        //     current = current->left;
+        // return current;
     }
 
     template<typename pair>
     Node<pair> *most_right(Node<pair> *root)
     {
-        Node<pair> *current = root;
-        while (current->right != NULL)
-            current = current->right;
-        return current;
+        if (!root)
+            return root;
+        while (root->right)
+            root = root->right;
+        return root;
+        // Node<pair> *current = root;
+        // while (current->right != NULL)
+        //     current = current->right;
+        // return current;
     }
 
     template<typename pair>
@@ -89,6 +105,8 @@ namespace ft
         }
         else
         {
+            if (node->left != NULL)
+                return most_right(node->left);
            current = node->parent;
             while (current != NULL && node == current->left)
             {
@@ -517,16 +535,24 @@ namespace ft
 
            node_type    *_max(node_type *node)
            {
-               if (node->right == NULL)
+               if (node == NULL)
                    return node;
-                return _max(node->right);
+               while (node->right != NULL)
+                   node = node->right;
+                return node;
            }
 
               node_type    *_min(node_type *node) const
               {
-                if (node->left == NULL)
-                     return node;
-                 return _min(node->left);
+                  std::cout << "gg" <<node->data->first << std::endl;
+                  if (!node)
+                    return node;
+                while (node->left != NULL)
+                {
+                    std::cout << "check :: " <<node->data->first << std::endl;
+                    node = node->left;
+                }
+                return node;
               }
 
               void  swap(Avl &other)
@@ -546,7 +572,7 @@ namespace ft
             node_type *successor(node_type *node) const
             {
                 if (node->right != NULL)
-                    return _min(node->right);
+                    return most_left(node->right);
                 node_type *tmp = node->parent;
                 while (tmp != NULL && node == tmp->right)
                 {

@@ -17,16 +17,28 @@ namespace ft
 
             bidirectional_iterator()  : _node(NULL), _root(NULL) {}
             bidirectional_iterator(node_pointer node, node_pointer *root) : _node(node), _root(root) {}
-            bidirectional_iterator(const bidirectional_iterator &other)
-            {
-                *this = other;
-            }
-            bidirectional_iterator &operator=(const bidirectional_iterator &other)
-            {
-                _node = other._node;
-                _root = other._root;
-                return *this;
-            }
+
+            bidirectional_iterator(bidirectional_iterator const &other) { _root = other._root; _node = other._node; }
+
+			bidirectional_iterator & operator=(bidirectional_iterator const & src)
+			{
+				if (this != &src)
+				{
+					_root = src._root;
+					_node = src._node;
+				}
+				return (*this);
+			}
+            // bidirectional_iterator(const bidirectional_iterator &other)
+            // {
+            //     *this = other;
+            // }
+            // bidirectional_iterator &operator=(const bidirectional_iterator &other)
+            // {
+            //     _node = other._node;
+            //     _root = other._root;
+            //     return *this;
+            // }
             ~bidirectional_iterator() {}
 
             pair_reference operator*() const
@@ -80,9 +92,9 @@ namespace ft
             {
                 return ft::bidirectional_iterator<Node,pair>(_node, _root);
             }
-        private:
             node_pointer _node;
             node_pointer *_root;
+        private:
     };
     template< typename Node, typename pair>
     class const_bidirectional_iterator

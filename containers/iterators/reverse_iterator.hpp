@@ -17,7 +17,8 @@ namespace ft
             typedef typename iterator_traits<iterator_type>::iterator_category iterator_category;
 
             reverse_iterator(): current() {}
-            explicit reverse_iterator(iterator_type it) : current(it) {}
+            explicit reverse_iterator(iterator_type it) : current(it) {
+            }
             template<class Iter>
             reverse_iterator(const reverse_iterator<Iter>& it) : current(it.base()) {}
 
@@ -33,7 +34,6 @@ namespace ft
             reference operator*() const
             {
                 iterator_type tmp = current;
-                std::cout << "check" << std::endl;
                 return *--tmp;
             }
 
@@ -41,20 +41,17 @@ namespace ft
             {
                 iterator_type tmp(current);
                 --tmp;
-                std::cout << "heeeeeeere" << std::endl;
                 return tmp.operator->();
             }
 
             reverse_iterator& operator++()
             {
-                std::cout << "increment1" << std::endl;
                 --current;
                 return *this;
             }
 
             reverse_iterator operator++(int)
             {
-                 std::cout << "increment2" << std::endl;
                 reverse_iterator tmp = *this;
                 --current;
                 return tmp;

@@ -34,8 +34,8 @@ namespace ft
             typedef ft::Node<value_type> node_type;
             typedef ft::bidirectional_iterator<node_type, value_type> iterator;
             typedef ft::bidirectional_iterator<node_type, value_type> const_iterator;
-            typedef std::reverse_iterator<iterator> reverse_iterator;
-            typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+            typedef ft::reverse_iterator<iterator> reverse_iterator;
+            typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
             typedef ptrdiff_t difference_type;
             typedef class value_compare : public std::binary_function<value_type, value_type, bool>
             {
@@ -108,20 +108,22 @@ namespace ft
 
                 iterator begin()
                 {
-                    node_type *tmp = _tree._min(_tree.root);
+                    node_type *tmp = most_left(_tree.root);
+                    // std::cout << "debug: " << tmp->data->first << std::endl;
+                    // std::cout << "debug: " << tmp->data->second << std::endl;
                     return (iterator(tmp, const_cast<node_type **>(&_tree.root))); //casting
                 }
 
                 const_iterator begin() const
                 {
-                    node_type *tmp = _tree._min(_tree.root);
+                    node_type *tmp = most_left(_tree.root);
                     return (const_iterator(tmp, const_cast<node_type **>(&_tree.root))); //casting
                 }
 
                 // iterator end
                 iterator end()
                 {
-                    return iterator(NULL, &_tree.root);
+                    return iterator(NULL, const_cast<node_type **>(&_tree.root));
                 }
 
                 const_iterator end() const
@@ -132,9 +134,7 @@ namespace ft
                 // reverse iterator rbegin
                 reverse_iterator rbegin()
                 {
-                    std::cout << "rbegin" << std::endl;
                     return reverse_iterator(end());
-                    std::cout << "rbegin2" << std::endl;
                 }
 
                 const_reverse_iterator rbegin() const
@@ -145,10 +145,7 @@ namespace ft
                 // reverse iterator rend
                 reverse_iterator rend()
                 {
-                    std::cout << "rend" << std::endl;
-                    std::cout << begin()->first << std::endl;
-                    return reverse_iterator(++begin());//segfauuuuuuult
-                    std::cout << "rend2" << std::endl;
+                    return reverse_iterator(begin());//segfauuuuuuult
                 }
                 
                 const_reverse_iterator rend() const
@@ -368,7 +365,20 @@ namespace ft
     {
         return rhs < lhs;
     }
+    template <class k, class T, class Comp, class Allocat>
+    bool operator<=(const ft::map<k, T, Comp, Allocat> &lhs,
+                    const ft::map<k, T, Comp, Allocat> &rhs)
+    {
+        return !(rhs < lhs);
+    }
 
+    template <class k, class T, class Comp, class Allocat>
+    bool operator>=(const ft::map<k, T, Comp, Allocat> &lhs,
+                    const ft::map<k, T, Comp, Allocat> &rhs)
+    {
+        return !(lhs < rhs);
+    }
+    
 
 
 
