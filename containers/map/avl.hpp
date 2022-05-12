@@ -1,9 +1,12 @@
 #pragma once
 
 #include <stdlib.h>
+#include <vector>
+#include <time.h>
 #include "pair.hpp"
 #include "make_pair.hpp"
 #include "../iterators/bidirectional_iterator.hpp"
+#include <iostream>
 
 // typedef struct s_node
 // {
@@ -18,6 +21,16 @@
 namespace ft
 {
 
+    struct time_clock{
+
+        clock_t start;
+        double duration;
+        bool started;
+        time_clock() {
+            duration = 0;
+            started = false;
+        }
+    };
     template<typename pair>
     class Node
     {
@@ -40,7 +53,7 @@ namespace ft
     {
         if (!root)
             return root;
-        while (root->left)
+        while (root->left != NULL)
         {
             // std::cout << "parrent " << root->data->first << std::endl;
             // std::cout << "left->first " << root->left->data->first << std::endl;
@@ -133,12 +146,13 @@ namespace ft
             typedef bidirectional_iterator<node_type, value_type> iterator;
             typedef const_bidirectional_iterator<node_type, value_type> const_iterator;
 
+                size_t call_count;
             private:
+                std::vector<time_clock> clocks;
                 size_type _size;
                 Compare _comp;
                 allocator_type _pair_allocator;
                 node_allocator _node_allocator;
-                
                 node_type *newNode(value_type value)
                 {
                     node_type *tmp = _node_allocator.allocate(1);
@@ -147,7 +161,7 @@ namespace ft
                     tmp->left = NULL;
                     tmp->right = NULL;
                     tmp->parent = NULL;
-                    tmp->height = 0;
+                    tmp->height = 1;
                     tmp->balance_factor = 0;
                     return tmp;
                 }
@@ -156,7 +170,7 @@ namespace ft
                 {
                     if (node == NULL)
                         return 0;
-                    return 1 + std::max(height(node->left), height(node->right));
+                    return node->height;
                 }
 
                 bool __equal(const key_type &key1, const key_type &key2) const 
@@ -248,6 +262,7 @@ namespace ft
                     node->balance_factor = getBalanceFactor(node);
                     tmp->height = max(height(tmp->left), height(tmp->right)) + 1;
                     tmp->balance_factor = getBalanceFactor(tmp);
+                    
                     return tmp;
                 }
 
@@ -264,12 +279,49 @@ namespace ft
                     return rotateLeft(node);
                 }
                
+               node_type  *update(node_type *node)
+               {
+                    call_count++;
+
+                    clock_start(8);
+                    clock_start(4);
+                    node->height = max(height(node->left), height(node->right)) + 1;
+                    node->balance_factor = getBalanceFactor(node);
+                    clock_stop(4);
+                    clock_start(5);
+                    if (node->balance_factor > 1)
+                    {
+                        if (getBalanceFactor(node->left) >= 0)
+                            node= rotateRight(node);
+                        else
+                            node= rotateLeftRight(node); // rotateRightLeft
+                    }
+                    else if (node->balance_factor < -1)
+                    {
+                        if (getBalanceFactor(node->right) < 0)
+                            node=  rotateLeft(node);
+                        else
+                            node = rotateRightLeft(node); // rotateRightLeft
+                    }
+                    clock_stop(5);
+                    clock_stop(8);
+
+
+                    return node;
+               }
+              
+
+               
+
                 node_type *insert_helper(node_type *node, value_type value)
                 {
+                    if (clocks.size() >= 7)
+                        clock_stop(6);
+                    clock_start(6);
                     if (root == NULL)
                     {
-                        root = newNode(value);
-                        return root;
+                        return newNode(value);
+                        //return root;
                     }
                     if (node == NULL)
                         return  newNode(value);
@@ -285,25 +337,13 @@ namespace ft
                     }
                     else
                         return node;
-                    node->height = max(height(node->left), height(node->right)) + 1;
-                    node->balance_factor = getBalanceFactor(node);
-                    if (node->balance_factor > 1)
-                    {
-                        if (getBalanceFactor(node->left) >= 0)
-                            node =  rotateRight(node);
-                        else
-                            node =  rotateLeftRight(node); // rotateRightLeft
-                    }
-                    else if (node->balance_factor < -1)
-                    {
-                        if (getBalanceFactor(node->right) < 0)
-                            node =  rotateLeft(node);
-                        else
-                            node =  rotateRightLeft(node); // rotateRightLeft
-                    }
-                    return node;
+                    clock_stop(6);
+                    clock_start(7);
+                    node_type*ret =  update(node);
+                    clock_stop(7);
+                    return ret;
                 }
-
+//7bess
          
 
                 node_type   *deleteNode_helper(node_type *node, const key_type &key1)
@@ -436,6 +476,7 @@ namespace ft
 
                 Avl() : _size(0), _comp(), _pair_allocator(), _node_allocator(), root(NULL)
                 {
+                    call_count = 0;
                 }
 
                 Avl(const Avl &other) : _size(other._size), root(NULL)
@@ -509,12 +550,43 @@ namespace ft
                 }
             bool   insert(const value_type &value)
             {
+                clock_start(2);
                 if (exists(value.first))
                     return false;
+                clock_stop(2);
+                clock_start(3);
                 root = insert_helper(root, value);
+                clock_stop(3);
                 _size++;
                 return true;
             }
+
+             void clock_print_all()
+                {
+                    for (int i = 0; i < clocks.size(); i++)
+                    {
+                        std::cout << "Clock " << i << ": " << clocks[i].duration << std::endl;
+                    }
+                }
+                 void clock_start(int i)
+               {
+                //    if (i >= clocks.size())
+                //        clocks.resize(i + 1);
+                //     if (clocks[i].started)
+                //         clock_stop(i);
+
+                //     clocks[i].start = std::clock();
+                //     clocks[i].started = true;
+               }
+
+                void clock_stop(int i)
+                {
+                    // if (!clocks[i].started)
+                    //     return ;
+                    // clock_t end = std::clock();
+                    // clocks[i].duration += (end - clocks[i].start) / (double)CLOCKS_PER_SEC;
+                    // clocks[i].started = false;
+                }
 
             int    height() const
             {
@@ -662,6 +734,17 @@ namespace ft
                 printBT( prefix + (isLeft ? "│   " : "    "), node->left, true);
                 printBT( prefix + (isLeft ? "│   " : "    "), node->right, false);
             }
+        }
+
+        int depth() const
+        {
+            return depth(root);
+        }
+        int depth(node_type *node) const
+        {
+            if (node == NULL)
+                return 0;
+            return 1 + std::max(depth(node->left), depth(node->right));
         }
 
 void print()

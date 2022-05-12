@@ -88,10 +88,10 @@ namespace ft
                 return (_node != other._node);
             }
 
-            operator    ft::bidirectional_iterator<Node,pair>() const
-            {
-                return ft::bidirectional_iterator<Node,pair>(_node, _root);
-            }
+            // operator    ft::const_bidirectional_iterator<Node,pair>() const
+            // {
+            //     return ft::bidirectional_iterator<Node,pair>(_node, _root);
+            // }
             node_pointer _node;
             node_pointer *_root;
         private:

@@ -7,8 +7,9 @@
 #include "../utils/lexicographical_compare.hpp"
 #include "../utils/equal.hpp"
 #include "../vector/Vector.hpp"
+#include "../utils/enable_if.hpp"
 #include <vector>
-
+#include <iostream>
 namespace ft
 {
     template <
@@ -65,7 +66,7 @@ namespace ft
 
                 template <class InputIterator>
                 map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(),
-                    const allocator_type &alloc = allocator_type()) : _tree(), _compare(comp), _allocator(alloc)
+                    const allocator_type &alloc = allocator_type(), typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = 0 ) : _tree(), _compare(comp), _allocator(alloc)
                 {
                     int i= 0;
                     while (first != last)
@@ -103,7 +104,7 @@ namespace ft
 
                 ~map()
                 {
-                    //clear();
+                    clear();
                 }
 
                 iterator begin()
@@ -254,17 +255,26 @@ namespace ft
                     return _allocator;
                 }
 
+                size_t call_count()
+                {
+                    return _tree.call_count;
+                }
 
 
                 //insert single element
                 pair<iterator, bool> insert(const value_type &val)
                 {
+                    _tree.clock_start(0);
                     ft::pair<key_type, mapped_type> p = ft::make_pair(val.first, val.second);
                     node_type *tmp = _tree.search(_tree.root, val.first);
+                    _tree.clock_stop(0);
+
                     if (tmp == NULL)
                     {
+                        _tree.clock_start(1);
                         _tree.insert(p);
                         tmp = _tree.search(_tree.root, val.first);
+                         _tree.clock_stop(1);
                         return (pair<iterator, bool>(iterator(tmp, const_cast<node_type **>(&_tree.root)), true)); //casting
                     }
                     else
@@ -292,10 +302,14 @@ namespace ft
 
                 iterator    lower_bound(const key_type &key1)
                 {
-                    node_type *tmp = _tree.lower_bound(_tree.root, key1);
-                    if (tmp == NULL)
-                        return end();
-                    return (iterator(tmp, &_tree.root));
+                    if (_tree.exists(key1))
+                    {
+                        node_type *tmp = _tree.lower_bound(_tree.root, key1);
+                        if (tmp == NULL)
+                            return end();
+                        return (iterator(tmp, &_tree.root));
+                    }
+                    return iterator(NULL, &_tree.root);
                 }
 
                 const_iterator lower_bound(const key_type &key1) const
@@ -303,7 +317,7 @@ namespace ft
                     node_type *tmp = _tree.lower_bound(_tree.root, key1);
                     if (tmp == NULL)
                         return end();
-                    return (const_iterator(tmp, &_tree.root));
+                    return (const_iterator(tmp, const_cast<node_type **>(&_tree.root)));
                 }
 
                 iterator    upper_bound(const key_type &key1)
@@ -319,7 +333,7 @@ namespace ft
                     node_type *tmp = _tree.upper_bound(_tree.root, key1);
                     if (tmp == NULL)
                         return end();
-                    return (const_iterator(tmp, &_tree.root));
+                    return (const_iterator(tmp,const_cast<node_type **>(&_tree.root)));
                 }
                 void   print()
                 {
@@ -336,6 +350,15 @@ namespace ft
                 {
                     ft::pair<const_iterator, const_iterator> p = ft::make_pair(lower_bound(key1), upper_bound(key1));
                     return p;
+                }
+
+                int depth() const
+                {
+                    return _tree.depth();
+                }
+                void    clock_print_all()
+                {
+                    _tree.clock_print_all();
                 }
     };
     template <class k, class T, class Comp, class Allocat>

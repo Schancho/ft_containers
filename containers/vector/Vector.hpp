@@ -6,6 +6,7 @@
 #include <memory>
 #include "../iterators/iterator.hpp"
 #include "../iterators/reverse_iterator.hpp"
+#include "../utils/lexicographical_compare.hpp"
 #include <algorithm>
 #include <iterator>
 #include "../utils/enable_if.hpp"
