@@ -302,14 +302,11 @@ namespace ft
 
                 iterator    lower_bound(const key_type &key1)
                 {
-                    if (_tree.exists(key1))
-                    {
+               
                         node_type *tmp = _tree.lower_bound(_tree.root, key1);
                         if (tmp == NULL)
                             return end();
                         return (iterator(tmp, &_tree.root));
-                    }
-                    return iterator(NULL, &_tree.root);
                 }
 
                 const_iterator lower_bound(const key_type &key1) const
