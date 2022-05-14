@@ -19,9 +19,9 @@ namespace ft
             iterator_op(){}
             iterator_op(T *ptr) : _ptr(ptr) {}
             iterator_op(const iterator_op &it) : _ptr(it._ptr) {}
-            operator  iterator_op<const T> ()
-            {
-                return iterator_op<const T>(_ptr);
+            operator  iterator_op< const value_type>() const 
+            { 
+                return iterator_op< const value_type>(_ptr); 
             }
             //  operator  iterator_op< const T> ()  const
             // {
@@ -34,6 +34,10 @@ namespace ft
                 return *this;
             }
 
+            pointer base() const 
+            { 
+                return _ptr; 
+            }
             iterator_op &operator++()
             {
                 ++_ptr;
@@ -126,62 +130,42 @@ namespace ft
                 return _ptr[n];
             }
 
-            bool operator==(const iterator_op &it)
+            template <class U>
+            bool operator==(const iterator_op<U> &it) const 
             {
-                return _ptr == it._ptr;
+                return _ptr == it.base();
             }
 
-                 bool operator==(const iterator_op &it) const 
+            template <class U>
+            bool operator!=(const iterator_op<U> &it) const
             {
-                return _ptr == it._ptr;
-            }
-
-            bool operator!=(const iterator_op &it)
-            {
-                return _ptr != it._ptr;
+                return _ptr != it.base();
             }   
 
-                    bool operator!=(const iterator_op &it) const 
+            template <class U>
+            bool operator<(const iterator_op<U> &it) const
             {
-                return _ptr != it._ptr;
-            }   
-
-            bool operator<(const iterator_op &it)
-            {
-                return _ptr < it._ptr;
+                return _ptr < it.base();
             }
 
-                 bool operator<(const iterator_op &it) const 
+            template <class U>
+            bool operator>(const iterator_op<U> &it) const
             {
-                return _ptr < it._ptr;
+                return _ptr > it.base();
             }
 
-            bool operator>(const iterator_op &it)
+            template <class U>
+            bool operator<=(const iterator_op<U> &it) const
             {
-                return _ptr > it._ptr;
+                return _ptr <= it.base();
             }
-               bool operator>(const iterator_op &it) const 
+   
+            template <class U>
+            bool operator>=(const iterator_op<U> &it) const
             {
-                return _ptr > it._ptr;
-            }
-
-            bool operator<=(const iterator_op &it)
-            {
-                return _ptr <= it._ptr;
-            }
-                 bool operator<=(const iterator_op &it) const 
-            {
-                return _ptr <= it._ptr;
+                return _ptr >= it.base();
             }
 
-            bool operator>=(const iterator_op &it)
-            {
-                return _ptr >= it._ptr;
-            }
-                      bool operator>=(const iterator_op &it) const 
-            {
-                return _ptr >= it._ptr;
-            }
             pointer get_pointer(){
 				return _ptr;
 			}

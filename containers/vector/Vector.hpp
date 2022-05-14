@@ -1,20 +1,19 @@
-#ifndef Vector_HPP
-# define Vector_HPP
+#pragma once
 
 # include <iostream>
 # include <string>
 #include <memory>
-#include "../iterators/iterator.hpp"
-#include "../iterators/reverse_iterator.hpp"
-#include "../utils/lexicographical_compare.hpp"
+#include "../../iterators/iterator.hpp"
+#include "../../iterators/reverse_iterator.hpp"
+#include "../../utils/lexicographical_compare.hpp"
 #include <algorithm>
 #include <iterator>
-#include "../utils/enable_if.hpp"
+#include "../../utils/enable_if.hpp"
 
 namespace ft {
 
 template < class T, class Alloc = std::allocator<T> > 
-class Vector
+class vector
 {
 	public:
 			typedef	T	value_type;
@@ -32,7 +31,7 @@ class Vector
 			//typedef std::allocator<value_type> allocator_type;
 
 
-		explicit Vector (const allocator_type& alloc = allocator_type())
+		explicit vector (const allocator_type& alloc = allocator_type())
 			: _alloc(alloc)
 		{
 			_capacity = 0;
@@ -40,7 +39,7 @@ class Vector
 			_data = _alloc.allocate(_capacity);
 		}
 
-		Vector (size_type n, const value_type& value = value_type(), const allocator_type& alloc = allocator_type())
+		vector (size_type n, const value_type& value = value_type(), const allocator_type& alloc = allocator_type())
 			: _alloc(alloc)
 		{
 			_capacity = n;
@@ -51,7 +50,7 @@ class Vector
 				_alloc.construct(&_data[i], value);
 		}
 
-		Vector (const Vector& other)
+		vector (const vector& other)
 			: _alloc(other._alloc)
 		{
 			_capacity = other._capacity;
@@ -61,7 +60,7 @@ class Vector
 				_alloc.construct(&_data[i], other._data[i]);
 		}
 
-		Vector	&operator= (const Vector& other)
+		vector	&operator= (const vector& other)
 		{
 			if (this != &other)
 			{
@@ -76,7 +75,7 @@ class Vector
 		}
 
 		template <class InputIterator>
-		Vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), 
+		vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), 
 			typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = NULL)
 			: _alloc(alloc)
 		{
@@ -99,7 +98,7 @@ class Vector
 				_alloc.construct(&_data[i], *first);
 		}
 		
-		~Vector ()
+		~vector ()
 		{
 			for (size_type i = 0; i < _size; i++)
 				_alloc.destroy(&_data[i]);
@@ -109,7 +108,7 @@ class Vector
 
 
 		// template <class T, class Alloc>
-	  	friend	bool operator== (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+	  	friend	bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			if (lhs.size() !=  rhs.size())
 				return false;
@@ -122,31 +121,31 @@ class Vector
 		}
 
 				// template <class T, class Alloc>
-	  	friend	bool operator!= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+	  	friend	bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return !(lhs == rhs);
 		}
 
 		// template <class T, class Alloc>
-		friend bool operator< (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 		}
 
 				// template <class T, class Alloc>
-		friend bool operator >(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator >(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return  rhs < lhs;
 		}
 
 		// template <class T, class Alloc>
-		friend bool operator <=(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator <=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return  !(rhs < lhs);
 		}
 
 				// template <class T, class Alloc>
-		friend bool operator >=(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator >=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return  !( lhs < rhs);
 		}
@@ -300,7 +299,7 @@ class Vector
 		}
 
 
-		void swap(Vector& other)
+		void swap(vector& other)
 		{
 			std::swap(_data, other._data);
 			std::swap(_size, other._size);
@@ -452,14 +451,10 @@ class Vector
 };
 
 template <class T, class Alloc>
-void	swap(Vector<T, Alloc>& a, Vector<T, Alloc>& b)
+void	swap(vector<T, Alloc>& a, vector<T, Alloc>& b)
 {
 	a.swap(b);
 }
 
 }
 
-
-
-
-#endif

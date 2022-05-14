@@ -1,13 +1,13 @@
 #pragma once
 
 #include <iterator>
-#include "../iterators/bidirectional_iterator.hpp"
-#include "../iterators/reverse_iterator.hpp"
+#include "../../iterators/bidirectional_iterator.hpp"
+#include "../../iterators/reverse_iterator.hpp"
 #include "avl.hpp"
-#include "../utils/lexicographical_compare.hpp"
-#include "../utils/equal.hpp"
-#include "../vector/Vector.hpp"
-#include "../utils/enable_if.hpp"
+#include "../../utils/lexicographical_compare.hpp"
+#include "../../utils/equal.hpp"
+#include "../vector/vector.hpp"
+#include "../../utils/enable_if.hpp"
 #include <vector>
 #include <iostream>
 namespace ft
@@ -177,16 +177,16 @@ namespace ft
 
                 void erase(iterator first, iterator last)
                 {
-                   ft::Vector<key_type> keys;
+                   ft::vector<key_type> keys;
                     while (first != last)
                     {
                         keys.push_back(first->first);
                         ++first;
                     }
-                    typename ft::Vector<key_type>::iterator it = keys.begin();
+                    typename ft::vector<key_type>::iterator it = keys.begin();
                     while (it != keys.end())
                     {
-                        erase(*it);
+                        erase(*it);                       
                         ++it;
                     }
                 }
