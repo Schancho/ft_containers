@@ -13,21 +13,6 @@
 
 namespace ft {
 
-// 	template <class InputIterator1, class InputIterator2>
-//   bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1,
-//                                 InputIterator2 first2, InputIterator2 last2)
-// {
-//   while (first1!=last1)
-//   {
-//     if (first2==last2 || *first2<*first1) return false;
-//     else if (*first1<*first2) return true;
-//     ++first1; ++first2;
-//   }
-//   return (first2!=last2);
-// }
-
-
-
 template < class T, class Alloc = std::allocator<T> > 
 class Vector
 {
@@ -218,7 +203,6 @@ class Vector
 	
 		void resize(size_type n, value_type val = value_type())
 		{
-			//std::cout << "resize: size " << _size << " n " << n << std::endl; 
 			if (n < _size)
 			{
 				for (size_type i = n; i < _size; i++)
@@ -243,14 +227,9 @@ class Vector
                 throw std::length_error("length error");
 			if (cap > _capacity)
 			{
-				//_capacity = cap;
 				pointer tmp = _alloc.allocate(cap);
 				for (size_type i = 0; i < _size; i++)
 					_alloc.construct(tmp + i, _data[i]);
-					//tmp[i] = _data[i];
-				// {
-				// 	_alloc.construct(tmp+i, _data[i]);
-				// }
 				_alloc.deallocate(_data, _capacity);
 				_data = tmp;
 				_capacity = cap;
@@ -312,7 +291,6 @@ class Vector
                 reserve(_capacity == 0 ? 1 : _capacity * 2);
             _alloc.construct(_data + _size, val);
 			_size++;
-			//std::cout << "_cap " << _capacity << "size " << _size << std::endl;
 		}
 		
 		void pop_back()
@@ -370,13 +348,6 @@ class Vector
 			_size = n;
 		}
 
-
-		// void			pop_back()
-		// {
-		// 	_alloc.destroy(_data + _size - 1);
-		// 	--_size;
-		// }
-
 		iterator		insert(iterator pos, const value_type& val)
 		{
 			difference_type n = pos - _data;
@@ -391,36 +362,29 @@ class Vector
 
 		void 	insert(iterator pos, size_type n, const value_type& val)
 		{
-			// size_t p = std::distance(this->begin(), pos);
 			difference_type p = pos - _data;
 			if (_capacity < _size + n && n <= _size)
                 reserve(_capacity * 2);
             else if (_size + n > _capacity)
                 reserve(_capacity + n);
-			
 			if (_size)
 			{
 				
 				for (difference_type i = _size - 1; i >= p ; i--)
 				{
-					//std::cout << "i " << i << " size "<< _size << " n " << n << std::endl;
 					_alloc.construct(_data +i + n, _data[i]); 
 					if (i == p)
 						break;
 				}
 					
-			}
-				
-                
+			}  
             for (size_type i = 0; i < n; ++i)
 				_alloc.construct(_data + p + i, val);
-            // _data[p + i] = val;
             _size += n;
 		}
 		template <class InputIterator>
     	void insert (iterator position, InputIterator first, InputIterator last , typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = NULL)
 		{
-			//std::cout << " 3" << std::endl;
 			(void)f;
 			difference_type pos = position - _data;
 			size_type n = last - first;
@@ -437,13 +401,12 @@ class Vector
 						break;
 				}
 			}
-				
 			for (size_type i = 0; i < n; ++i)
 				_alloc.construct(_data + pos + i, *(first+i));
-			//_data[pos + i] = *(first + i);
 			_size += n;
 		}
-		 allocator_type get_allocator()
+
+		allocator_type get_allocator()
             {
                 return _alloc;
             }
@@ -454,34 +417,32 @@ class Vector
 			_size = 0;
 		}
 
-		void			print(void) const
-		{
-			for (unsigned int i = 0; i < _size; i++)
-				std::cout << _data[i] << std::endl;
-		}
-
-
+		// void			print(void) const
+		// {
+		// 	for (unsigned int i = 0; i < _size; i++)
+		// 		std::cout << _data[i] << std::endl;
+		// }
 		
-iterator erase (iterator position)
-{
-	size_t p = &position - _data;
-	for (size_t i = p; i < _size - 1; i++)
-		_alloc.construct(_data + i, _data[i + 1]);
-	_alloc.destroy(_data + _size - 1);
-	_size--;
-	return iterator(_data + p);
-}
-iterator erase (iterator first, iterator last)
-{
-	size_t p = &first - _data;
-	size_t q = &last - _data;
-	for (size_t i = p; i < q; i++)
-		_alloc.destroy(_data + i);
-	for (size_t i = q; i < _size - 1; i++)
-		_alloc.construct(_data + i, _data[i + 1]);
-	_size -= q - p;
-	return iterator(_data + p);
-}
+		iterator erase (iterator position)
+		{
+			size_t p = &position - _data;
+			for (size_t i = p; i < _size - 1; i++)
+				_alloc.construct(_data + i, _data[i + 1]);
+			_alloc.destroy(_data + _size - 1);
+			_size--;
+			return iterator(_data + p);
+		}
+		iterator erase (iterator first, iterator last)
+		{
+			size_t p = &first - _data;
+			size_t q = &last - _data;
+			for (size_t i = p; i < q; i++)
+				_alloc.destroy(_data + i);
+			for (size_t i = q; i < _size - 1; i++)
+				_alloc.construct(_data + i, _data[i + 1]);
+			_size -= q - p;
+			return iterator(_data + p);
+		}
 
 	private:
 		pointer				_data;
@@ -496,13 +457,6 @@ void	swap(Vector<T, Alloc>& a, Vector<T, Alloc>& b)
 	a.swap(b);
 }
 
-// bool oprator <(a, b)
-// {
-// 	lexicographical_compare(a.begin(), a.end(), b.begin(), b.end())
-// }
-// bool oprator >()
-// {
-// 	return !(a < b)
 }
 
 

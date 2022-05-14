@@ -66,21 +66,13 @@ namespace ft
 
                 template <class InputIterator>
                 map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(),
-                    const allocator_type &alloc = allocator_type(), typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = 0 ) : _tree(), _compare(comp), _allocator(alloc)
+                    const allocator_type &alloc = allocator_type(), typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = NULL) : _tree(), _compare(comp), _allocator(alloc)
                 {
-                    int i= 0;
+                    (void)f;
                     while (first != last)
                     {
-                        
-                       // std::cout << "debug1: "<< first->first << std::endl;
-                        
                         insert(*first);
-                        //std::cout << "debug2: "<< first->second << std::endl;
                         ++first;
-                        //std::cout << "debug3: "<< first->second << std::endl;
-                        // i++;
-                        // if (i == 6)
-                        //     break;
                     }
                 }
 
@@ -110,18 +102,15 @@ namespace ft
                 iterator begin()
                 {
                     node_type *tmp = most_left(_tree.root);
-                    // std::cout << "debug: " << tmp->data->first << std::endl;
-                    // std::cout << "debug: " << tmp->data->second << std::endl;
-                    return (iterator(tmp, const_cast<node_type **>(&_tree.root))); //casting
+                    return (iterator(tmp, const_cast<node_type **>(&_tree.root))); 
                 }
 
                 const_iterator begin() const
                 {
                     node_type *tmp = most_left(_tree.root);
-                    return (const_iterator(tmp, const_cast<node_type **>(&_tree.root))); //casting
+                    return (const_iterator(tmp, const_cast<node_type **>(&_tree.root)));
                 }
 
-                // iterator end
                 iterator end()
                 {
                     return iterator(NULL, const_cast<node_type **>(&_tree.root));
@@ -132,7 +121,6 @@ namespace ft
                     return const_iterator(NULL, const_cast<node_type **>(&_tree.root));
                 }
 
-                // reverse iterator rbegin
                 reverse_iterator rbegin()
                 {
                     return reverse_iterator(end());
@@ -143,10 +131,9 @@ namespace ft
                     return const_reverse_iterator(end());
                 }
 
-                // reverse iterator rend
                 reverse_iterator rend()
                 {
-                    return reverse_iterator(begin());//segfauuuuuuult
+                    return reverse_iterator(begin());
                 }
                 
                 const_reverse_iterator rend() const
@@ -190,13 +177,13 @@ namespace ft
 
                 void erase(iterator first, iterator last)
                 {
-                   std::vector<key_type> keys;
+                   ft::Vector<key_type> keys;
                     while (first != last)
                     {
                         keys.push_back(first->first);
                         ++first;
                     }
-                    typename std::vector<key_type>::iterator it = keys.begin();
+                    typename ft::Vector<key_type>::iterator it = keys.begin();
                     while (it != keys.end())
                     {
                         erase(*it);
@@ -255,35 +242,22 @@ namespace ft
                     return _allocator;
                 }
 
-                size_t call_count()
-                {
-                    return _tree.call_count;
-                }
-
-
-                //insert single element
                 pair<iterator, bool> insert(const value_type &val)
                 {
-                    _tree.clock_start(0);
                     ft::pair<key_type, mapped_type> p = ft::make_pair(val.first, val.second);
                     node_type *tmp = _tree.search(_tree.root, val.first);
-                    _tree.clock_stop(0);
-
                     if (tmp == NULL)
                     {
-                        _tree.clock_start(1);
                         _tree.insert(p);
                         tmp = _tree.search(_tree.root, val.first);
-                         _tree.clock_stop(1);
-                        return (pair<iterator, bool>(iterator(tmp, const_cast<node_type **>(&_tree.root)), true)); //casting
+                        return (pair<iterator, bool>(iterator(tmp, const_cast<node_type **>(&_tree.root)), true));
                     }
                     else
                     {
-                        return (pair<iterator, bool>(iterator(tmp, const_cast<node_type **>(&_tree.root)), false)); //casting
+                        return (pair<iterator, bool>(iterator(tmp, const_cast<node_type **>(&_tree.root)), false));
                     }
                 }
 
-                //insert range
                 template <class InputIterator>
                 void    insert(InputIterator first, InputIterator last)
                 {
@@ -293,7 +267,6 @@ namespace ft
                     }
                 }
 
-                //insert with hint
                 iterator insert(iterator position, const value_type &val)
                 {
                     (void)position;
@@ -348,15 +321,6 @@ namespace ft
                     ft::pair<const_iterator, const_iterator> p = ft::make_pair(lower_bound(key1), upper_bound(key1));
                     return p;
                 }
-
-                int depth() const
-                {
-                    return _tree.depth();
-                }
-                void    clock_print_all()
-                {
-                    _tree.clock_print_all();
-                }
     };
     template <class k, class T, class Comp, class Allocat>
     bool operator==(const ft::map<k, T, Comp, Allocat> &lhs,
@@ -398,9 +362,4 @@ namespace ft
     {
         return !(lhs < rhs);
     }
-    
-
-
-
-
 }

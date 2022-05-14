@@ -1,36 +1,15 @@
 #pragma once
 
 #include <stdlib.h>
-#include <vector>
 #include <time.h>
 #include "pair.hpp"
 #include "make_pair.hpp"
 #include "../iterators/bidirectional_iterator.hpp"
 #include <iostream>
 
-// typedef struct s_node
-// {
-//     int data;
-//     s_node *left;
-//     s_node *right;
-//     s_node *parent;
-//     int height;
-    
-// }t_node;
-
 namespace ft
 {
 
-    struct time_clock{
-
-        clock_t start;
-        double duration;
-        bool started;
-        time_clock() {
-            duration = 0;
-            started = false;
-        }
-    };
     template<typename pair>
     class Node
     {
@@ -54,18 +33,8 @@ namespace ft
         if (!root)
             return root;
         while (root->left != NULL)
-        {
-            // std::cout << "parrent " << root->data->first << std::endl;
-            // std::cout << "left->first " << root->left->data->first << std::endl;
-            // std::cout << "left->second " << root->left->data->second << std::endl;
             root = root->left;
-        }
         return root;
-        
-        // Node<pair> *current = root;
-        // while (current->left != NULL)
-        //     current = current->left;
-        // return current;
     }
 
     template<typename pair>
@@ -76,10 +45,6 @@ namespace ft
         while (root->right)
             root = root->right;
         return root;
-        // Node<pair> *current = root;
-        // while (current->right != NULL)
-        //     current = current->right;
-        // return current;
     }
 
     template<typename pair>
@@ -146,9 +111,7 @@ namespace ft
             typedef bidirectional_iterator<node_type, value_type> iterator;
             typedef const_bidirectional_iterator<node_type, value_type> const_iterator;
 
-                size_t call_count;
             private:
-                std::vector<time_clock> clocks;
                 size_type _size;
                 Compare _comp;
                 allocator_type _pair_allocator;
@@ -281,14 +244,8 @@ namespace ft
                
                node_type  *update(node_type *node)
                {
-                    call_count++;
-
-                    clock_start(8);
-                    clock_start(4);
                     node->height = max(height(node->left), height(node->right)) + 1;
                     node->balance_factor = getBalanceFactor(node);
-                    clock_stop(4);
-                    clock_start(5);
                     if (node->balance_factor > 1)
                     {
                         if (getBalanceFactor(node->left) >= 0)
@@ -303,25 +260,14 @@ namespace ft
                         else
                             node = rotateRightLeft(node); // rotateRightLeft
                     }
-                    clock_stop(5);
-                    clock_stop(8);
-
-
                     return node;
                }
-              
-
-               
 
                 node_type *insert_helper(node_type *node, value_type value)
                 {
-                    if (clocks.size() >= 7)
-                        clock_stop(6);
-                    clock_start(6);
                     if (root == NULL)
                     {
                         return newNode(value);
-                        //return root;
                     }
                     if (node == NULL)
                         return  newNode(value);
@@ -337,14 +283,9 @@ namespace ft
                     }
                     else
                         return node;
-                    clock_stop(6);
-                    clock_start(7);
                     node_type*ret =  update(node);
-                    clock_stop(7);
                     return ret;
                 }
-//7bess
-         
 
                 node_type   *deleteNode_helper(node_type *node, const key_type &key1)
                 {
@@ -391,46 +332,6 @@ namespace ft
                             _pair_allocator.construct(node->data, *(tmp->data));
                             node->right = deleteNode_helper(node->right, tmp->data->first);
                         }
-
-                        // if (node->left == NULL && node->right == NULL)
-                        // {
-                        //     node_type *tmp = node;
-                        //     // _pair_allocator.destroy(tmp->data);
-                        //     // _pair_allocator.deallocate(tmp->data, 1);
-                        //     // _node_allocator.deallocate(tmp, 1);
-                        //     node = NULL;
-                        //     return node;
-                        // }
-                        // else if (node->left == NULL)
-                        // {
-                        //     node_type *tmp = node;
-                        //     node = node->right;
-                        //     _pair_allocator.destroy(tmp->data);
-                        //     _pair_allocator.deallocate(tmp->data, 1);
-                        //     _node_allocator.deallocate(tmp, 1);
-                        //     //free(tmp);
-                        //     return node;
-                        // }
-                        // else if (node->right == NULL)
-                        // {
-                        //     node_type *tmp = node;
-                        //     node = node->left;
-                        //     _pair_allocator.destroy(tmp->data);
-                        //     _pair_allocator.deallocate(tmp->data, 1);
-                        //     _node_allocator.deallocate(tmp, 1);
-                        //     //free(tmp);
-                        //     return node;
-                        // }
-                        // else
-                        // {
-                        //     node_type *tmp = node->right;
-                        //     while (tmp->left != NULL)
-                        //         tmp = tmp->left;
-                        //     node->data = tmp->data;
-                        //     // node->data->first = tmp->data->first;
-                        //     // node->data->second = tmp->data->second;
-                        //     node->right = deleteNode_helper(node->right, tmp->data->first);
-                        // }
                     }
                     if (node == NULL)
                         return node;
@@ -441,42 +342,22 @@ namespace ft
                         if (getBalanceFactor(node->left) >= 0)
                             node =  rotateRight(node);
                         else
-                            node =  rotateLeftRight(node); // rotateRightLeft
+                            node =  rotateLeftRight(node); 
                     }
                     else if (node->balance_factor < -1)
                     {
                         if (getBalanceFactor(node->right) < 0)
                             node =  rotateLeft(node);
                         else
-                            node =  rotateRightLeft(node); // rotateRightLeft
+                            node =  rotateRightLeft(node); 
                     }
                     return node;
                 }
 
-                    // node->balance_factor = getBalanceFactor(node);
-
-                    // if (node->balance_factor > 1)
-                    // {
-                    //     if (getBalanceFactor(node->left) >= 0)
-                    //         node =  rotateRight(node);
-                    //     else
-                    //         node =  rotateLeftRight(node); // rotateRightLeft
-                    // }
-                    // else if (node->balance_factor < -1)
-                    // {
-                    //     if (getBalanceFactor(node->right) < 0)
-                    //         node =  rotateLeft(node);
-                    //     else
-                    //         node =  rotateRightLeft(node); // rotateRightLeft
-                    // }
-                    // return node;
-               // }
-
             public:    
 
-                Avl() : _size(0), _comp(), _pair_allocator(), _node_allocator(), root(NULL)
+                Avl() : root(NULL), _size(0), _comp(), _pair_allocator(), _node_allocator()
                 {
-                    call_count = 0;
                 }
 
                 Avl(const Avl &other) : _size(other._size), root(NULL)
@@ -525,10 +406,6 @@ namespace ft
                     return _size == 0;
                 }
 
-                // node_type  *find(const key_type &key1)
-                // {
-                //     return __find(root, key1);
-                // }
                 bool    exists(const key_type &key1) 
                 {
                     return (__exist(root, key1));
@@ -548,44 +425,14 @@ namespace ft
                             return search(node->right, key1);
                     }
                 }
-            bool   insert(const value_type &value)
-            {
-                clock_start(2);
-                if (exists(value.first))
-                    return false;
-                clock_stop(2);
-                clock_start(3);
-                root = insert_helper(root, value);
-                clock_stop(3);
-                _size++;
-                return true;
-            }
 
-             void clock_print_all()
+                bool   insert(const value_type &value)
                 {
-                    for (int i = 0; i < clocks.size(); i++)
-                    {
-                        std::cout << "Clock " << i << ": " << clocks[i].duration << std::endl;
-                    }
-                }
-                 void clock_start(int i)
-               {
-                //    if (i >= clocks.size())
-                //        clocks.resize(i + 1);
-                //     if (clocks[i].started)
-                //         clock_stop(i);
-
-                //     clocks[i].start = std::clock();
-                //     clocks[i].started = true;
-               }
-
-                void clock_stop(int i)
-                {
-                    // if (!clocks[i].started)
-                    //     return ;
-                    // clock_t end = std::clock();
-                    // clocks[i].duration += (end - clocks[i].start) / (double)CLOCKS_PER_SEC;
-                    // clocks[i].started = false;
+                    if (exists(value.first))
+                        return false;
+                    root = insert_helper(root, value);
+                    _size++;
+                    return true;
                 }
 
             int    height() const
@@ -616,14 +463,10 @@ namespace ft
 
               node_type    *_min(node_type *node) const
               {
-                  std::cout << "gg" <<node->data->first << std::endl;
                   if (!node)
                     return node;
                 while (node->left != NULL)
-                {
-                    std::cout << "check :: " <<node->data->first << std::endl;
                     node = node->left;
-                }
                 return node;
               }
 
