@@ -2,7 +2,7 @@
 #include <iostream>  // std::cout
 #include <algorithm> // std::equal
 #include <vector>    // std::vector
-#include "../vector/vector.hpp"
+#include "../containers/vector/vector.hpp"
 
 #define GREEN "\e[1;32m"
 #define DEFAULT "\e[0;37m"
