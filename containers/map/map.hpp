@@ -66,9 +66,9 @@ namespace ft
 
                 template <class InputIterator>
                 map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(),
-                    const allocator_type &alloc = allocator_type(), typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = NULL) : _tree(), _compare(comp), _allocator(alloc)
+                    const allocator_type &alloc = allocator_type()) : _tree(), _compare(comp), _allocator(alloc)
                 {
-                    (void)f;
+                    //(void)f;
                     while (first != last)
                     {
                         insert(*first);
@@ -275,35 +275,58 @@ namespace ft
 
                 iterator    lower_bound(const key_type &key1)
                 {
-               
-                        node_type *tmp = _tree.lower_bound(_tree.root, key1);
-                        if (tmp == NULL)
-                            return end();
-                        return (iterator(tmp, &_tree.root));
+                    iterator it = begin();
+                    iterator bg = end();
+                    while (it != bg)
+                    {
+                        if (_compare(it->first, key1) == false)
+                            break ;
+                        ++it;
+                    }
+                    return (it);
+                    // node_type *tmp = _tree.lower_bound(_tree.root, key1);
+                    // if (tmp == NULL)
+                    //     return end();
+                    // return (iterator(tmp, const_cast<node_type **>(&_tree.root)));
                 }
 
                 const_iterator lower_bound(const key_type &key1) const
                 {
-                    node_type *tmp = _tree.lower_bound(_tree.root, key1);
-                    if (tmp == NULL)
-                        return end();
-                    return (const_iterator(tmp, const_cast<node_type **>(&_tree.root)));
+                    const_iterator it = begin();
+                    const_iterator bg = end();
+                    while (it != bg)
+                    {
+                        if (_compare(it->first, key1) == false)
+                            break ;
+                        ++it;
+                    }
+                    return (it);
                 }
 
                 iterator    upper_bound(const key_type &key1)
                 {
-                    node_type *tmp = _tree.upper_bound(_tree.root, key1);
-                    if (tmp == NULL)
-                        return end();
-                    return (iterator(tmp, &_tree.root));
+                    iterator it = begin();
+                    iterator bg = end();
+                    while (it != bg)
+                    {
+                        if (_compare(key1, it->first) == true)
+                            break ;
+                        ++it;
+                    }
+                    return (it);
                 }
 
                 const_iterator upper_bound(const key_type &key1) const
                 {
-                    node_type *tmp = _tree.upper_bound(_tree.root, key1);
-                    if (tmp == NULL)
-                        return end();
-                    return (const_iterator(tmp,const_cast<node_type **>(&_tree.root)));
+                    const_iterator it = begin();
+                    const_iterator bg = end();
+                    while (it != bg)
+                    {
+                        if (_compare(key1, it->first) == true)
+                            break ;
+                        ++it;
+                    }
+                    return (it);
                 }
                 void   print()
                 {

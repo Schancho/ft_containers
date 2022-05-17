@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <iterator>
 #include "../../utils/enable_if.hpp"
+#include "../../utils/is_integral.hpp"
 
 namespace ft {
 
@@ -37,6 +38,7 @@ class vector
 			_capacity = 0;
 			_size = 0;
 			_data = _alloc.allocate(_capacity);
+			// std::cout << _data << std::endl;
 		}
 
 		vector (size_type n, const value_type& value = value_type(), const allocator_type& alloc = allocator_type())
@@ -76,7 +78,7 @@ class vector
 
 		template <class InputIterator>
 		vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), 
-			typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = NULL)
+			typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type *f = NULL)
 			: _alloc(alloc)
 		{
 		// 	_capacity = std::distance(first, last);
@@ -203,20 +205,23 @@ class vector
 		void resize(size_type n, value_type val = value_type())
 		{
 			if (n < _size)
-			{
-				for (size_type i = n; i < _size; i++)
-					_alloc.destroy(&_data[i]);
-				_size = n;
-			}
-			else if (n > _size)
-			{
-				reserve(n);
-				for (size_type i = _size; i < n; i++)
-					_alloc.construct(&_data[i], val);
-				_size = n;
-			}
-			if (n > _capacity)
-				reserve(n);
+            {
+                for (size_type i = n; i < _size; ++i)
+                    _alloc.destroy(_data + i);
+                _size = n;
+            }
+            else if (n > _capacity)
+            {
+                if (n > (_capacity * 2))
+                    reserve(n);
+                else
+                    reserve(_capacity * 2);
+                for (size_type i = _size; i < n; ++i)
+                    push_back(val);
+            }
+            else if (n > _size)
+                for (size_type i = _size; i < n; ++i)
+                    push_back(val);
 		}
 
 
@@ -228,12 +233,17 @@ class vector
 			{
 				pointer tmp = _alloc.allocate(cap);
 				for (size_type i = 0; i < _size; i++)
+				{
 					_alloc.construct(tmp + i, _data[i]);
+					_alloc.destroy(_data + i);
+				}
+				//_alloc.destroy()
 				_alloc.deallocate(_data, _capacity);
 				_data = tmp;
 				_capacity = cap;
 			}
 		}
+
 		bool empty() const
 		{
 			return _size == 0;
@@ -308,7 +318,7 @@ class vector
 
 		template <class InputIterator>
 		void assign(InputIterator first, InputIterator last,
-					typename std::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type* = 0)
+					typename std::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0)
 		{
 			size_type n = last - first;
 			if (n > _capacity)
@@ -382,33 +392,51 @@ class vector
             _size += n;
 		}
 		template <class InputIterator>
-    	void insert (iterator position, InputIterator first, InputIterator last , typename ft::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type *f = NULL)
+    	void insert (iterator position, InputIterator first, InputIterator last , typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type *f = NULL)
 		{
+
 			(void)f;
+			// difference_type pos = position - _data;
+			// size_type n = last - first;
+			// if (_capacity < _size + n && n <= _size)
+			// 	reserve(_capacity * 2);
+			// else if (_size + n > _capacity)
+			// 	reserve(_capacity + n);
+			// if (_size)
+			// {
+			// 	for (difference_type i = _size - 1; i >= pos ; i--)
+			// 	{
+			// 		_alloc.construct(_data +i + n, _data[i]); 
+			// 		if (i == pos)
+			// 			break;
+			// 	}
+			// }
+			// for (size_type i = 0; i < n; ++i)
+			// 	_alloc.construct(_data + pos + i, *(first+i));
+			// _size += n;
 			difference_type pos = position - _data;
-			size_type n = last - first;
-			if (_capacity < _size + n && n <= _size)
-				reserve(_capacity * 2);
-			else if (_size + n > _capacity)
-				reserve(_capacity + n);
-			if (_size)
-			{
-				for (difference_type i = _size - 1; i >= pos ; i--)
-				{
-					_alloc.construct(_data +i + n, _data[i]); 
-					if (i == pos)
-						break;
-				}
-			}
-			for (size_type i = 0; i < n; ++i)
-				_alloc.construct(_data + pos + i, *(first+i));
+            size_type n = last - first;
+            if (_capacity < _size + n && n <= _size)
+                reserve(_capacity * 2);
+            else if (_size + n > _capacity)
+                reserve(_capacity + n);
+			pointer tmp = _data;
+			size_type size = _size;
+            for (size_type i = pos; i < _size; ++i)
+                _alloc.construct(_data + i + n,  _data[i]);
+            for (size_type i = 0; i < n; ++i)
+                _alloc.construct(_data + pos + i, *(first + i));
+			for (size_type i = 0; i < size; i++)
+				_alloc.destroy(tmp + i);
+            //_alloc.deallocate(tmp, _capacity);
 			_size += n;
 		}
 
 		allocator_type get_allocator()
-            {
-                return _alloc;
-            }
+        {
+            return _alloc;
+        }
+		
 		void	clear()
 		{
 			for (size_type i = 0; i < _size; i++)
@@ -433,14 +461,11 @@ class vector
 		}
 		iterator erase (iterator first, iterator last)
 		{
-			size_t p = &first - _data;
-			size_t q = &last - _data;
-			for (size_t i = p; i < q; i++)
-				_alloc.destroy(_data + i);
-			for (size_t i = q; i < _size - 1; i++)
-				_alloc.construct(_data + i, _data[i + 1]);
-			_size -= q - p;
-			return iterator(_data + p);
+			size_type n = last - first;
+            for (size_type i = first - _data; i < _size - n; ++i)
+                _data[i] = _data[i + n];
+            _size -= n;
+            return first;
 		}
 
 	private:
