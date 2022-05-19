@@ -1,4 +1,4 @@
-COMPILER = c++ -std=c++98 -g -fsanitize=address 
+COMPILER = c++ -std=c++98 #-g #-fsanitize=address 
 FLAGS = -Wall -Wextra -Werror 
 
 vector:

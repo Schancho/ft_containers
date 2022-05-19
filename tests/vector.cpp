@@ -940,6 +940,7 @@ std::cout << YELLOW << "\t===================================test swap==========
 	}
 }
 
+system("leaks vector");
 	return 0;
 
 }
